@@ -23,6 +23,7 @@ r_imperatives_number = len(r_imperatives_names)
 designs_number = parts_number * 2
 
 big_m = 100000 # todo find a good big m
+np.random.seed(1048596)
 
 # create lists of using the number of each set
 supplier_list = list(range(0, supplier_number))
@@ -70,7 +71,7 @@ designs_of_parts = np.random.randint(0, 2, (parts_number, designs_number)) # row
 
 
 
-r_parts = np.random.randint(1, 10, (parts_number)) #got replaced, not in use anymore
+
 alpha = np.random.rand(plants_number, periods_number)
 beta = np.random.rand(retailers_number, periods_number)
 t_cost = 10  # A given constant for transportation cost or time, for example
@@ -368,7 +369,18 @@ for i in model.suppliers:
     for j in model.plants:
         for c in model.parts:
             for p in model.periods:
-                print(model.x[i,j,c,p].value)
+                if model.x[i,j,c,p].value != 0:
+                    print(i,j,c,p)
+                    print(model.x[i, j, c, p].value)
+
+# flows from retailers to customers
+for k in model.retailers:
+    for l in model.customers:
+        for p in model.periods:
+                if model.z[k,l,p].value != 0:
+                    print(k,l,p)
+                    print(model.z[k,l,p].value)
+
 
 model.objective_variable.value
 
