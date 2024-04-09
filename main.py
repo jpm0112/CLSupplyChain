@@ -8,6 +8,11 @@ import pandas as pd
 # todo it would be best to defined a better set. In the meantime, this works.
 # todo maybe define the design alternatives as part of the architecture: arch1 can be the same as arch2 but with a diferent design alternative for a part
 
+
+# todo remove periods
+# add reuse flow
+# create instance
+
 # define the size of each set
 supplier_number = 3
 plants_number = 2
@@ -63,6 +68,13 @@ flow_cost_disassembly_disposal = np.random.randint(1, 100, (collection_centres_n
 flow_cost_disassembly_remanufacturing_centres = np.random.randint(1, 100, (disassembly_centres_number, remanufacturing_centres_number))
 flow_cost_remanufacturing_centre_plants = np.random.randint(1, 100, (remanufacturing_centres_number, plants_number))
 
+df = pd.DataFrame(flow_cost_suppliers_plants)
+# df.to_csv('flow_cost_suppliers_plants.csv')
+# flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv')
+
+
+
+
 # Initialize other parameters with random or specified values
 parts_of_architecture = np.random.randint(0, 3, (architecture_number, parts_number)) # rows are the architectures and columns are the part, replaces the r parameter in the model
 r_imperatives_of_architecture = np.random.randint(0, 2, (architecture_number, r_imperatives_number)) # rows are architectures and columns the part. It has a value of 1 if the r-imperative is possible with the architecutre
@@ -74,10 +86,6 @@ designs_of_parts = np.random.randint(0, 2, (parts_number, designs_number)) # row
 alpha = np.random.rand(plants_number, periods_number)
 beta = np.random.rand(retailers_number, periods_number)
 t_cost = 10  # A given constant for transportation cost or time, for example
-s = np.random.randint(1, 20, (supplier_number, parts_number)) # Cost of parts from suppliers
-w = np.random.randint(1, 20, (remanufacturing_centres_number, parts_number)) # Cost of refurbished parts
-h_limit = np.random.randint(1, 5, (periods_number)) # Total supply chain capacity limit for a period
-g_limit = np.random.randint(1, 5, (periods_number)) # Total demand limit for a period
 nu = 0.2  # Recycling rate, for example
 sigma = 0.1  # Breakage rate, for example
 lamda = 0.1  # Loss rate, for example
@@ -160,10 +168,6 @@ model.objective_relationship.add(
 
     + sum(model.f[r,j,c,p] * flow_cost_remanufacturing_centre_plants[r,j] for r in model.remanufacturing_centres for j in model.plants for c in model.parts for p in model.periods)
 
-    # operation costs
-    + sum(model.x[i,j,c,p] * s[i,c] for i in model.suppliers for j in model.plants for c in model.parts for p in model.periods)
-    + sum(model.f[r,j,c,p] * w[r,c] for r in model.remanufacturing_centres for c in model.parts for j in model.plants for p in model.periods)
-
     # opening costs
     + sum(model.h[j,p] * alpha[j,p] for j in model.plants for p in model.periods)
     + sum(model.g[k,p] * beta[k,p] for k in model.retailers for p in model.periods)
@@ -223,15 +227,6 @@ for l in model.customers:
     for p in model.periods:
         model.customer_demand_constraints.add(sum(model.z[k,l,p] for k in model.retailers) >= customers_demand[l,p])
 
-# constraint 12
-model.plant_opening_limit = pyo.ConstraintList()
-for p in model.periods:
-    model.plant_opening_limit.add(sum(model.h[j,p] for j in model.plants) <= h_limit[p])
-
-# constraint 13
-model.retailer_opening_limit = pyo.ConstraintList()
-for p in model.periods:
-    model.retailer_opening_limit.add(sum(model.g[k,p] for k in model.retailers) <= g_limit[p])
 
 # constraint 14
 model.plants_flow = pyo.ConstraintList()
