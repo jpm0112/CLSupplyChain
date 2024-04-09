@@ -6,6 +6,7 @@ import pandas as pd
 # todo now the designs alternatives set is fixed in dimensions. This means that for example, each part has to have 3 design alternatives.
 # todo in the modelling a part can have only 2 alternatives in a 3 dimension set if one is repeated.
 # todo it would be best to defined a better set. In the meantime, this works.
+# todo maybe define the design alternatives as part of the architecture: arch1 can be the same as arch2 but with a diferent design alternative for a part
 
 # define the size of each set
 supplier_number = 3
@@ -20,10 +21,10 @@ periods_number = 4
 architecture_number = 2
 r_imperatives_names = ['refurbishing', 'remanufacturing', 'recycling']
 r_imperatives_number = len(r_imperatives_names)
-designs_number = parts_number * 2
+designs_number = 2 # for each part, two designs
 
 big_m = 100000 # todo find a good big m
-np.random.seed(1048596)
+
 
 # create lists of using the number of each set
 supplier_list = list(range(0, supplier_number))
@@ -41,7 +42,7 @@ designs_list = list(range(0, designs_number))
 
 
 # parameters
-
+np.random.seed(1048596)
 # Initialize capacities with random values within a sensible range
 suppliers_capacity = np.random.randint(400, 500, (supplier_number, parts_number, periods_number))
 plants_capacity = np.random.randint(500, 800, (plants_number, periods_number))
@@ -52,15 +53,15 @@ disassembly_centres_capacity = np.random.randint(100, 400, (disassembly_centres_
 remanufacturing_centres_capacity = np.random.randint(100, 300, (remanufacturing_centres_number, parts_number, periods_number))
 
 # Initialize distances with random values representing kilometers, for example
-distance_suppliers_plants = np.random.randint(1, 100, (supplier_number, plants_number))
-distance_plants_retailers = np.random.randint(1, 100, (plants_number, retailers_number))
-distance_retailers_customers = np.random.randint(1, 50, (retailers_number, customers_number))
-distance_customers_collection_centres = np.random.randint(1, 50, (customers_number, collection_centres_number))
-distance_collection_centres_disassembly = np.random.randint(1, 100, (collection_centres_number, disassembly_centres_number))
-distance_collection_centres_plants = np.random.randint(1, 100, (collection_centres_number, plants_number))
-distance_disassembly_disposal = np.random.randint(1, 100, (collection_centres_number))
-distance_disassembly_remanufacturing_centres = np.random.randint(1, 100, (disassembly_centres_number, remanufacturing_centres_number))
-distance_remanufacturing_centre_plants = np.random.randint(1, 100, (remanufacturing_centres_number, plants_number))
+flow_cost_suppliers_plants = np.random.randint(1, 100, (supplier_number, plants_number))
+flow_cost_plants_retailers = np.random.randint(1, 100, (plants_number, retailers_number))
+flow_cost_retailers_customers = np.random.randint(1, 50, (retailers_number, customers_number))
+flow_cost_customers_collection_centres = np.random.randint(1, 50, (customers_number, collection_centres_number))
+flow_cost_collection_centres_disassembly = np.random.randint(1, 100, (collection_centres_number, disassembly_centres_number))
+flow_cost_collection_centres_plants = np.random.randint(1, 100, (collection_centres_number, plants_number))
+flow_cost_disassembly_disposal = np.random.randint(1, 100, (collection_centres_number))
+flow_cost_disassembly_remanufacturing_centres = np.random.randint(1, 100, (disassembly_centres_number, remanufacturing_centres_number))
+flow_cost_remanufacturing_centre_plants = np.random.randint(1, 100, (remanufacturing_centres_number, plants_number))
 
 # Initialize other parameters with random or specified values
 parts_of_architecture = np.random.randint(0, 3, (architecture_number, parts_number)) # rows are the architectures and columns are the part, replaces the r parameter in the model
@@ -68,8 +69,6 @@ r_imperatives_of_architecture = np.random.randint(0, 2, (architecture_number, r_
 r_imperatives_of_designs = np.random.randint(0, 2, (designs_number, r_imperatives_number)) # rows are designs and columns the part. It has a value of 1 if the r-imperative is possible with the design
 designs_of_architecture = np.random.randint(0, 2, (architecture_number, designs_number)) # rows are architecture and columns the design. It has a value of 1 if the design is possible with the architecture
 designs_of_parts = np.random.randint(0, 2, (parts_number, designs_number)) # rows are parts and columns the design. It has a value of 1 if the design is possible with the part
-
-
 
 
 alpha = np.random.rand(plants_number, periods_number)
@@ -105,7 +104,7 @@ model.remanufacturing_centres = pyo.Set(initialize=remanufacturing_centres_list)
 model.parts = pyo.Set(initialize=parts_list) # index c
 model.periods = pyo.Set(initialize=periods_list) # index p
 model.architectures = pyo.Set(initialize=architecture_list) # index a, available architectures
-model.r_imperatives = pyo.Set(initialize=r_imperatives_list) #  index e, possible r imperatives # todo this variable will be constrainted by the architecture and the porduct design selection
+model.r_imperatives = pyo.Set(initialize=r_imperatives_list) #  index e, possible r imperatives
 model.design_alternatives = pyo.Set(initialize=designs_list) # index s, possible designs that can be used in parts
 
 
@@ -126,19 +125,14 @@ model.f = pyo.Var(model.remanufacturing_centres, model.plants, model.parts, mode
 model.erf = pyo.Var(model.disassembly_centres, model.remanufacturing_centres, model.parts, model.periods, domain=pyo.NonNegativeReals) # flow from disassembly centre to remanufacturing centres due to refurbishing
 model.erm = pyo.Var(model.disassembly_centres, model.remanufacturing_centres, model.parts, model.periods, domain=pyo.NonNegativeReals) # flow from disassembly centre to remanufacturing centre due to remanufacturing
 model.er = pyo.Var(model.disassembly_centres, model.remanufacturing_centres, model.parts, model.periods, domain=pyo.NonNegativeReals) # flow from disassembly centre to remanufacturing centre due to recycling
-
-
-model.ar = pyo.Var(model.architectures, domain= pyo.Binary) # binary, 1 if the product follows architecture a
-model.de = pyo.Var(model.design_alternatives, model.parts, domain= pyo.Binary) # 1 if the design alternative s is used in part c
-
 # binary variables
 model.h = pyo.Var(model.plants,model.periods, domain=pyo.Binary) # if plant j is open at period p
 model.g = pyo.Var(model.retailers,model.periods, domain=pyo.Binary) # if retailer r is open at period p
 
-# todo create the constraints for the design and the r-imperatives
-# todo create the constraints for the design and the architecture
-# todo create constraitns for the design and the parts
 
+
+model.ar = pyo.Var(model.architectures, domain= pyo.Binary) # binary, 1 if the product follows architecture a
+model.de = pyo.Var(model.design_alternatives, model.parts, domain= pyo.Binary) # 1 if the design alternative s is used in part c
 
 model.rimp = pyo.Var(model.r_imperatives, domain=pyo.Binary) # if r imperative e is possible
 
@@ -153,18 +147,18 @@ model.objective = pyo.Objective(expr=model.objective_variable, sense=pyo.minimiz
 model.objective_relationship = pyo.ConstraintList()
 model.objective_relationship.add(
     # transport costs (the distances matrices must be in cost units)
-    sum(model.x[i,j,c,p] * distance_suppliers_plants[i,j] for i in model.suppliers for j in model.plants for c in model.parts for p in model.periods)
-    + sum(model.y[j,k,p] * distance_plants_retailers[j,k]  for j in model.plants for k in model.retailers for p in model.periods)
-    + sum(model.z[k,l,p] * distance_retailers_customers[k,l] for k in model.retailers for l in model.customers for p in model.periods)
-    + sum(model.w[l,m,p] * distance_customers_collection_centres[l,m] for l in model.customers for m in model.collection_centres for p in model.periods)
-    + sum(model.a[m,j,p] * distance_collection_centres_plants[m,j] for m in model.collection_centres for j in model.plants for p in model.periods)
-    + sum(model.b[m,d,p] * distance_collection_centres_disassembly[m,d] for m in model.collection_centres for d in model.disassembly_centres for p in model.periods)
-    + sum(model.d[d,c,p] * distance_disassembly_disposal[d] for d in model.disassembly_centres for c in model.parts for p in model.periods)
-    + sum(model.erf[d,r,c,p] * distance_disassembly_remanufacturing_centres[d,r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
-    + sum(model.erm[d,r,c,p] * distance_disassembly_remanufacturing_centres[d, r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
-    + sum(model.er[d,r,c,p] * distance_disassembly_remanufacturing_centres[d, r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
+    sum(model.x[i,j,c,p] * flow_cost_suppliers_plants[i,j] for i in model.suppliers for j in model.plants for c in model.parts for p in model.periods)
+    + sum(model.y[j,k,p] * flow_cost_plants_retailers[j,k] for j in model.plants for k in model.retailers for p in model.periods)
+    + sum(model.z[k,l,p] * flow_cost_retailers_customers[k,l] for k in model.retailers for l in model.customers for p in model.periods)
+    + sum(model.w[l,m,p] * flow_cost_customers_collection_centres[l,m] for l in model.customers for m in model.collection_centres for p in model.periods)
+    + sum(model.a[m,j,p] * flow_cost_collection_centres_plants[m,j] for m in model.collection_centres for j in model.plants for p in model.periods)
+    + sum(model.b[m,d,p] * flow_cost_collection_centres_disassembly[m,d] for m in model.collection_centres for d in model.disassembly_centres for p in model.periods)
+    + sum(model.d[d,c,p] * flow_cost_disassembly_disposal[d] for d in model.disassembly_centres for c in model.parts for p in model.periods)
+    + sum(model.erf[d,r,c,p] * flow_cost_disassembly_remanufacturing_centres[d,r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
+    + sum(model.erm[d,r,c,p] * flow_cost_disassembly_remanufacturing_centres[d, r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
+    + sum(model.er[d,r,c,p] * flow_cost_disassembly_remanufacturing_centres[d, r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
 
-    + sum(model.f[r,j,c,p] * distance_remanufacturing_centre_plants[r,j] for r in model.remanufacturing_centres for j in model.plants for c in model.parts for p in model.periods)
+    + sum(model.f[r,j,c,p] * flow_cost_remanufacturing_centre_plants[r,j] for r in model.remanufacturing_centres for j in model.plants for c in model.parts for p in model.periods)
 
     # operation costs
     + sum(model.x[i,j,c,p] * s[i,c] for i in model.suppliers for j in model.plants for c in model.parts for p in model.periods)
@@ -364,21 +358,30 @@ solver = 'gurobi'
 opt = pyo.SolverFactory(solver)
 solution = opt.solve(model)
 
-
+# form suppliers to plants
 for i in model.suppliers:
     for j in model.plants:
         for c in model.parts:
             for p in model.periods:
                 if model.x[i,j,c,p].value != 0:
-                    print(i,j,c,p)
+                    print("supplier:",i,"plant:",j,"part:",c,"period:",p)
                     print(model.x[i, j, c, p].value)
+
+
+# from plants to retailers
+for j in model.plants:
+    for k in model.retailers:
+        for p in model.periods:
+                if model.y[j,k,p].value != 0:
+                    print("plant:",j,"retailer:",k,"period:",p)
+                    print(model.y[j,k,p].value)
 
 # flows from retailers to customers
 for k in model.retailers:
     for l in model.customers:
         for p in model.periods:
                 if model.z[k,l,p].value != 0:
-                    print(k,l,p)
+                    print("retailer:",k,"customer:",l,"period:",p)
                     print(model.z[k,l,p].value)
 
 

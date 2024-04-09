@@ -293,6 +293,7 @@ for r in model.refurbishing_centres:
 max_time = 25
 solver = 'gurobi'
 opt = pyo.SolverFactory(solver)
+opt.options['TimeLimit'] = max_time
 solution = opt.solve(model)
 
 
