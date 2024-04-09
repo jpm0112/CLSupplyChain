@@ -57,7 +57,6 @@ collection_centres_capacity = np.random.randint(100, 500, (collection_centres_nu
 disassembly_centres_capacity = np.random.randint(100, 400, (disassembly_centres_number, parts_number, periods_number))
 remanufacturing_centres_capacity = np.random.randint(100, 300, (remanufacturing_centres_number, parts_number, periods_number))
 
-# Initialize distances with random values representing kilometers, for example
 flow_cost_suppliers_plants = np.random.randint(1, 100, (supplier_number, plants_number))
 flow_cost_plants_retailers = np.random.randint(1, 100, (plants_number, retailers_number))
 flow_cost_retailers_customers = np.random.randint(1, 50, (retailers_number, customers_number))
@@ -68,10 +67,10 @@ flow_cost_disassembly_disposal = np.random.randint(1, 100, (collection_centres_n
 flow_cost_disassembly_remanufacturing_centres = np.random.randint(1, 100, (disassembly_centres_number, remanufacturing_centres_number))
 flow_cost_remanufacturing_centre_plants = np.random.randint(1, 100, (remanufacturing_centres_number, plants_number))
 
-df = pd.DataFrame(flow_cost_suppliers_plants)
-df.to_csv('flow_cost_suppliers_plants.csv', index=False)
-flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv')
-flow_cost_suppliers_plants
+# df = pd.DataFrame(flow_cost_suppliers_plants)
+# df.to_csv('flow_cost_suppliers_plants.csv', index=False)
+# flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv')
+
 
 
 
@@ -387,6 +386,42 @@ model.objective_variable.value
 
 
 
+# Define function to convert numpy arrays to pandas DataFrame, save as CSV, and reload as DataFrame
+def numpy_to_csv_and_reload(data, filename):
+    # Convert to DataFrame
+    df = pd.DataFrame(data)
+    # Save to CSV
+    csv_path = filename+'.csv'
+    df.to_csv(csv_path, index=False)
+    # Reload from CSV
+    reloaded_df = pd.read_csv(csv_path)
+    return reloaded_df, csv_path
+
+# Convert and reload each array as per the given example
+flow_cost_suppliers_plants_df, flow_cost_suppliers_plants_path = numpy_to_csv_and_reload(flow_cost_suppliers_plants, 'flow_cost_suppliers_plants')
+flow_cost_plants_retailers_df, flow_cost_plants_retailers_path = numpy_to_csv_and_reload(flow_cost_plants_retailers, 'flow_cost_plants_retailers')
+flow_cost_retailers_customers_df, flow_cost_retailers_customers_path = numpy_to_csv_and_reload(flow_cost_retailers_customers, 'flow_cost_retailers_customers')
+flow_cost_customers_collection_centres_df, flow_cost_customers_collection_centres_path = numpy_to_csv_and_reload(flow_cost_customers_collection_centres, 'flow_cost_customers_collection_centres')
+flow_cost_collection_centres_disassembly_df, flow_cost_collection_centres_disassembly_path = numpy_to_csv_and_reload(flow_cost_collection_centres_disassembly, 'flow_cost_collection_centres_disassembly')
+flow_cost_collection_centres_plants_df, flow_cost_collection_centres_plants_path = numpy_to_csv_and_reload(flow_cost_collection_centres_plants, 'flow_cost_collection_centres_plants')
+flow_cost_disassembly_disposal_df, flow_cost_disassembly_disposal_path = numpy_to_csv_and_reload(flow_cost_disassembly_disposal, 'flow_cost_disassembly_disposal')
+flow_cost_disassembly_remanufacturing_centres_df, flow_cost_disassembly_remanufacturing_centres_path = numpy_to_csv_and_reload(flow_cost_disassembly_remanufacturing_centres, 'flow_cost_disassembly_remanufacturing_centres')
+flow_cost_remanufacturing_centre_plants_df, flow_cost_remanufacturing_centre_plants_path = numpy_to_csv_and_reload(flow_cost_remanufacturing_centre_plants, 'flow_cost_remanufacturing_centre_plants')
+
+# List of all saved file paths
+saved_files_paths = [
+    flow_cost_suppliers_plants_path,
+    flow_cost_plants_retailers_path,
+    flow_cost_retailers_customers_path,
+    flow_cost_customers_collection_centres_path,
+    flow_cost_collection_centres_disassembly_path,
+    flow_cost_collection_centres_plants_path,
+    flow_cost_disassembly_disposal_path,
+    flow_cost_disassembly_remanufacturing_centres_path,
+    flow_cost_remanufacturing_centre_plants_path,
+]
+
+saved_files_paths
 
 
 
