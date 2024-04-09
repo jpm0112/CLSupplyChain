@@ -69,9 +69,9 @@ flow_cost_disassembly_remanufacturing_centres = np.random.randint(1, 100, (disas
 flow_cost_remanufacturing_centre_plants = np.random.randint(1, 100, (remanufacturing_centres_number, plants_number))
 
 df = pd.DataFrame(flow_cost_suppliers_plants)
-# df.to_csv('flow_cost_suppliers_plants.csv')
-# flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv')
-
+df.to_csv('flow_cost_suppliers_plants.csv', index=False)
+flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv')
+flow_cost_suppliers_plants
 
 
 
