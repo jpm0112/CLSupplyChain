@@ -1,3 +1,8 @@
-﻿1;4
-2;5
-3;6
+﻿;;Battery;;Housing;;Chipset;;Antenna;;
+;;Chargeable;Non-chargeable;Destructive;Non-destructive;Programmable;Non-programmable;Fused metal ring;Module;
+;;1;2;3;4;6;7;8;9;
+Architecture 1;1;0;1;1;0;0;1;1;0;
+Architecture 2;2;1;0;1;0;0;1;1;0;
+Architecture 3;3;1;0;0;1;0;1;0;1;
+Architecture 4;4;1;0;0;1;1;0;0;1;
+Architecture 5;;1;0;1;;1;0;0;1;
