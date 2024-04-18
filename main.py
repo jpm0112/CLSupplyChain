@@ -13,6 +13,9 @@ input = pd.read_csv('input.csv', delimiter=';', header=None)
 # todo remove periods
 # add reuse flow
 # create instance
+# add index to X for the design alternative
+# add architecture index to capacities
+# different cost for archtecture in dissambly
 
 # define the size of each set
 supplier_number = 3
@@ -53,7 +56,7 @@ np.random.seed(1048596)
 suppliers_capacity = np.random.randint(400, 500, (supplier_number, parts_number))
 plants_capacity = np.random.randint(500, 800, (plants_number))
 retailers_capacity = np.random.randint(300, 600, (retailers_number))
-customers_demand = np.random.randint(20, 30, (customers_number))
+customers_demand = np.random.randint(2, 3, (customers_number))
 collection_centres_capacity = np.random.randint(100, 500, (collection_centres_number))
 disassembly_centres_capacity = np.random.randint(100, 400, (disassembly_centres_number, parts_number))
 remanufacturing_centres_capacity = np.random.randint(100, 300, (remanufacturing_centres_number, parts_number))
@@ -68,9 +71,7 @@ flow_cost_disassembly_disposal = np.random.randint(1, 100, (collection_centres_n
 flow_cost_disassembly_remanufacturing_centres = np.random.randint(1, 100, (disassembly_centres_number, remanufacturing_centres_number))
 flow_cost_remanufacturing_centre_plants = np.random.randint(1, 100, (remanufacturing_centres_number, plants_number))
 
-# df = pd.DataFrame(flow_cost_suppliers_plants)
-# df.to_csv('flow_cost_suppliers_plants.csv', index=False)
-# flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv')
+
 
 
 
@@ -80,7 +81,7 @@ parts_of_architecture = np.random.randint(0, 3, (architecture_number, parts_numb
 r_imperatives_of_architecture = np.random.randint(0, 2, (architecture_number, r_imperatives_number)) # rows are architectures and columns the part. It has a value of 1 if the r-imperative is possible with the architecutre
 r_imperatives_of_designs = np.random.randint(0, 2, (designs_number, r_imperatives_number)) # rows are designs and columns the part. It has a value of 1 if the r-imperative is possible with the design
 designs_of_architecture = np.random.randint(0, 2, (architecture_number, designs_number)) # rows are architecture and columns the design. It has a value of 1 if the design is possible with the architecture
-designs_of_parts = np.random.randint(0, 2, (parts_number, designs_number)) # rows are parts and columns the design. It has a value of 1 if the design is possible with the part
+designs_of_parts = np.random.randint(1, 2, (parts_number, designs_number)) # rows are parts and columns the design. It has a value of 1 if the design is possible with the part
 
 
 alpha = np.random.rand(plants_number)
@@ -165,7 +166,6 @@ model.objective_relationship.add(
     + sum(model.erf[d,r,c] * flow_cost_disassembly_remanufacturing_centres[d,r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts )
     + sum(model.erm[d,r,c] * flow_cost_disassembly_remanufacturing_centres[d, r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts )
     + sum(model.er[d,r,c] * flow_cost_disassembly_remanufacturing_centres[d, r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts )
-
     + sum(model.f[r,j,c] * flow_cost_remanufacturing_centre_plants[r,j] for r in model.remanufacturing_centres for j in model.plants for c in model.parts )
 
     # opening costs
@@ -175,7 +175,7 @@ model.objective_relationship.add(
     <= model.objective_variable)
 
 
-# constraint 5
+# # constraint 5
 model.capacity_suppliers_constraints = pyo.ConstraintList()
 for i in model.suppliers:
     for c in model.parts:
@@ -341,7 +341,7 @@ solution = opt.solve(model)
 for i in model.suppliers:
     for j in model.plants:
         for c in model.parts:
-                if model.x[i,j,c].value != 0:
+                # if model.x[i,j,c].value != 0:
                     print("supplier:",i,"plant:",j,"part:",c)
                     print(model.x[i, j, c].value)
 
@@ -350,7 +350,7 @@ for i in model.suppliers:
 for j in model.plants:
     for k in model.retailers:
 
-                if model.y[j,k].value != 0:
+                # if model.y[j,k].value != 0:
                     print("plant:",j,"retailer:",k)
                     print(model.y[j,k].value)
 
@@ -358,7 +358,7 @@ for j in model.plants:
 for k in model.retailers:
     for l in model.customers:
 
-                if model.z[k,l].value != 0:
+                # if model.z[k,l].value != 0:
                     print("retailer:",k,"customer:",l)
                     print(model.z[k,l].value)
 
