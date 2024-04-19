@@ -8,7 +8,21 @@ import pandas as pd
 # todo it would be best to defined a better set. In the meantime, this works.
 # todo maybe define the design alternatives as part of the architecture: arch1 can be the same as arch2 but with a diferent design alternative for a part
 
-input = pd.read_csv('input.csv', delimiter=';', header=None)
+# collection_processing_cost = pd.read_csv('collection_processing_cost.csv', delimiter=';', header=None)
+#
+# flow_cost_collection_centres_plants = pd.read_csv('flow_cost_collection_centres_plants.csv', delimiter=';', header = None)
+# flow_cost_collection_reprocessing = pd.read_csv('flow_cost_collection_reprocessing.csv', delimiter=';', header = None)
+# flow_cost_reprocessing_disposal = pd.read_csv('flow_cost_reprocessing_disposal.csv', delimiter=';', header = None)
+# flow_cost_reprocessing_plants = pd.read_csv('flow_cost_reprocessing_plants.csv', delimiter=';', header = None)
+flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv', delimiter=';', header = None)
+#
+# product_design = pd.read_csv('product_design.csv', delimiter=';', header = None)
+# production_cost = pd.read_csv('production_cost.csv', delimiter=';', header = None)
+# R_imperatives_cost = pd.read_csv('R_imperatives_cost.csv', delimiter=';', header = None)
+# R_imperatives_possibility = pd.read_csv('R_imperatives_possibility.csv', delimiter=';', header = None)
+virgin_material_purchasing_cost = pd.read_csv('virgin_material_purchasing_cost.csv', delimiter=';', header = None)
+
+
 
 # todo remove periods
 # add reuse flow
@@ -55,8 +69,8 @@ np.random.seed(1048596)
 # Initialize capacities with random values within a sensible range
 suppliers_capacity = np.random.randint(400, 500, (supplier_number, parts_number))
 plants_capacity = np.random.randint(500, 800, (plants_number))
-retailers_capacity = np.random.randint(300, 600, (retailers_number))
-customers_demand = np.random.randint(2, 3, (customers_number))
+# retailers_capacity = np.random.randint(300, 600, (retailers_number))
+retailer_demand = np.random.randint(2, 3, (retailers_number))
 collection_centres_capacity = np.random.randint(100, 500, (collection_centres_number))
 disassembly_centres_capacity = np.random.randint(100, 400, (disassembly_centres_number, parts_number))
 remanufacturing_centres_capacity = np.random.randint(100, 300, (remanufacturing_centres_number, parts_number))
@@ -106,7 +120,7 @@ model = pyo.ConcreteModel()
 model.suppliers = pyo.Set(initialize=supplier_list) # index i
 model.plants = pyo.Set(initialize=plants_list) # index j
 model.retailers = pyo.Set(initialize=retailers_list) # index k
-model.customers = pyo.Set(initialize=customers_list) # index l
+# model.customers = pyo.Set(initialize=customers_list) # index l
 model.collection_centres = pyo.Set(initialize=collection_centres_list) # index m
 model.disassembly_centres = pyo.Set(initialize=disassembly_centres_list) # index d
 model.remanufacturing_centres = pyo.Set(initialize=remanufacturing_centres_list) # index r
@@ -120,28 +134,27 @@ model.design_alternatives = pyo.Set(initialize=designs_list) # index s, possible
 # Define the  variables of the model
 
 # continuous variables
-model.x = pyo.Var(model.suppliers, model.plants,model.parts, domain= pyo.NonNegativeReals) # flow from suppliers to plants
+model.x = pyo.Var(model.suppliers, model.plants, model.parts, domain= pyo.NonNegativeReals) # flow from suppliers to plants
 model.y = pyo.Var(model.plants,model.retailers, domain= pyo.NonNegativeReals) # flow from plants to retailers
-model.z = pyo.Var(model.retailers,model.customers, domain= pyo.NonNegativeReals) # flow from retailers to customers
-model.w = pyo.Var(model.customers,model.collection_centres, domain= pyo.NonNegativeReals) # flow from customers to collection centres
-model.a = pyo.Var(model.collection_centres, model.plants, domain= pyo.NonNegativeReals) # flow from collection centres to plants
-model.b = pyo.Var(model.collection_centres, model.disassembly_centres, domain=pyo.NonNegativeReals) # flow from collection centres to disassembly centres
-model.d = pyo.Var(model.disassembly_centres,model.parts, domain=pyo.NonNegativeReals) # flow from from disassembly centres to disposal
-model.f = pyo.Var(model.remanufacturing_centres, model.plants, model.parts, domain=pyo.NonNegativeReals) # flow from remanufacturing centres to plants
-
+# model.z = pyo.Var(model.retailers,model.customers, domain= pyo.NonNegativeReals) # flow from retailers to customers
+model.w = pyo.Var(model.retailers,model.collection_centres, domain= pyo.NonNegativeReals) # flow from customers to collection centres
+model.a = pyo.Var(model.collection_centres, model.plants, domain= pyo.NonNegativeReals) # flow from collection/dissasembly centres to plants
+model.b = pyo.Var(model.collection_centres, model.retailers, domain= pyo.NonNegativeReals) # flow from collection/dissasembly centres to retailers
+model.d = pyo.Var(model.disassembly_centres, domain=pyo.NonNegativeReals) # flow from from collection/dissasembly centres to disposal
+model.f = pyo.Var(model.collection_centres, model.remanufacturing_centres, model.parts, domain=pyo.NonNegativeReals) # flow from collection/dissasembly centres to remanufacturing centres
 
 # divided the e flow into e_rf, e_rm and e_r (refurbishing, remanufacturing and recycling)
 model.erf = pyo.Var(model.disassembly_centres, model.remanufacturing_centres, model.parts, domain=pyo.NonNegativeReals) # flow from disassembly centre to remanufacturing centres due to refurbishing
 model.erm = pyo.Var(model.disassembly_centres, model.remanufacturing_centres, model.parts, domain=pyo.NonNegativeReals) # flow from disassembly centre to remanufacturing centre due to remanufacturing
 model.er = pyo.Var(model.disassembly_centres, model.remanufacturing_centres, model.parts, domain=pyo.NonNegativeReals) # flow from disassembly centre to remanufacturing centre due to recycling
-# binary variables
+# binary variables # todo add these kind of variables for the rest of the relevant nodes
 model.h = pyo.Var(model.plants, domain=pyo.Binary) # if plant j is open at period p
 model.g = pyo.Var(model.retailers, domain=pyo.Binary) # if retailer r is open at period p
 
 
 
 model.ar = pyo.Var(model.architectures, domain= pyo.Binary) # binary, 1 if the product follows architecture a
-model.de = pyo.Var(model.design_alternatives, model.parts, domain= pyo.Binary) # 1 if the design alternative s is used in part c
+model.de = pyo.Var(model.design_alternatives, model.parts, domain= pyo.Binary) # 1 if the design alternative s is used for part c
 
 model.rimp = pyo.Var(model.r_imperatives, domain=pyo.Binary) # if r imperative e is possible
 
@@ -156,7 +169,7 @@ model.objective = pyo.Objective(expr=model.objective_variable, sense=pyo.minimiz
 model.objective_relationship = pyo.ConstraintList()
 model.objective_relationship.add(
     # transport costs (the distances matrices must be in cost units)
-    sum(model.x[i,j,c] * flow_cost_suppliers_plants[i,j] for i in model.suppliers for j in model.plants for c in model.parts )
+    sum(model.x[i,j,c] * flow_cost_suppliers_plants[i,j] for i in model.suppliers for j in model.plants for c in model.parts)
     + sum(model.y[j,k] * flow_cost_plants_retailers[j,k] for j in model.plants for k in model.retailers )
     + sum(model.z[k,l] * flow_cost_retailers_customers[k,l] for k in model.retailers for l in model.customers )
     + sum(model.w[l,m] * flow_cost_customers_collection_centres[l,m] for l in model.customers for m in model.collection_centres )
@@ -175,59 +188,60 @@ model.objective_relationship.add(
     <= model.objective_variable)
 
 
-# # constraint 5
+# # constraint 1: capacity of suppliers
 model.capacity_suppliers_constraints = pyo.ConstraintList()
 for i in model.suppliers:
     for c in model.parts:
             model.capacity_suppliers_constraints.add(sum(model.x[i,j,c] for j in model.plants) <= suppliers_capacity[i,c])
 
-# constraint 6
+
+# constraint 2: capacity of plants
 model.capacity_plants_constraints = pyo.ConstraintList()
 for j in model.plants:
         model.capacity_plants_constraints.add(sum(model.y[j,k] for k in model.retailers) <= plants_capacity[j]*model.h[j])
 
-# constraint 7
-model.capacity_retailers_constraints = pyo.ConstraintList()
+# constraint 3: demand of retailers
+model.demand_retailers_constraints = pyo.ConstraintList()
 for k in model.retailers:
-        model.capacity_retailers_constraints.add(sum(model.z[k,l] for l in model.customers) <= retailers_capacity[k] * model.g[k])
+        model.demand_retailers_constraints.add(sum(model.w[k,m] for m in model.collection_centres) >= retailer_demand[k])
 
-# constraint 8
+# constraint 4: capacity of the collection/disassembly centre
 model.capacity_collection_centres_constraints = pyo.ConstraintList()
 for m in model.collection_centres:
-        model.capacity_collection_centres_constraints.add(sum(model.a[m,j] for j in model.plants)
-                                              + sum(model.b[m,d] for d in model.disassembly_centres )
-                                              <= collection_centres_capacity[m])
+    for s in model.design_alternatives:
+        for c in model.parts:
+            for a in model.architectures:
+                model.capacity_collection_centres_constraints.add((sum(model.a[m, j] for j in model.plants)
+                                                                   + sum(model.b[m, k] for k in model.retailers)
+                                                                   + model.d[m]) * model.ar[a] * parts_of_architecture[a,c]
+                                                                  + sum(model.f[m, r, c] for r in
+                                                                        model.remanufacturing_centres)
+                                                                  <= collection_centres_capacity[m, c])
 
-# constraint 9
-model.disassembly_centres_capacity_constraints = pyo.ConstraintList()
-for d in model.disassembly_centres:
-    for c in model.parts:
-            model.disassembly_centres_capacity_constraints.add(model.d[d,c]
-                                                               + sum(model.erf[d,r,c] for r in model.remanufacturing_centres)
-                                                               + sum(model.erm[d,r,c] for r in model.remanufacturing_centres)
-                                                               + sum(model.er[d,r,c] for r in model.remanufacturing_centres)
-                                                               <= disassembly_centres_capacity[d,c])
 
-# constraint 10
+# constraint 5: capacity of the refurbishing centres
 model.remanufacturing_centres_capacity_constraints = pyo.ConstraintList()
 for r in model.remanufacturing_centres:
     for c in model.parts:
+            model.remanufacturing_centres_capacity_constraints.add(sum(model.erf[r,j,c] for j in model.plants)
+                                                               + sum(model.erm[r,j,c] for j in model.plants)
+                                                               + sum(model.er[r,j,c] for j in model.plants)
+                                                               <= remanufacturing_centres_capacity[r,c])
 
-            model.remanufacturing_centres_capacity_constraints.add(sum(model.f[r,j,c] for j in model.plants)
-                                                                   <= remanufacturing_centres_capacity[r,c])
+
 
 # constraint 11
 model.customer_demand_constraints = pyo.ConstraintList()
 for l in model.customers:
-        model.customer_demand_constraints.add(sum(model.z[k,l] for k in model.retailers) >= customers_demand[l])
+        model.customer_demand_constraints.add(sum(model.z[k,l] for k in model.retailers) >= retailer_demand[l])
 
 
 # constraint 14
 model.plants_flow = pyo.ConstraintList()
 for j in model.plants:
     for c in model.parts:
-
-                model.plants_flow.add(sum(model.x[i,j,c] for i in model.suppliers)
+        for s in model.design_alternatives:
+                model.plants_flow.add(sum(model.x[i,j,s] for i in model.suppliers)
                                       + sum(model.f[r,j,c] for r in model.remanufacturing_centres)
                                       + sum(parts_of_architecture[a,c] * model.ar[a] * model.a[m,j] for a in model.architectures for m in model.collection_centres)
                                       - sum(parts_of_architecture[a,c] * model.ar[a] * model.y[j,k] for a in model.architectures for k in model.retailers)
