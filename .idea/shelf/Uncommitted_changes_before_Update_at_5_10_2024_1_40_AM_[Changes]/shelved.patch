@@ -1,0 +1,318 @@
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import pyomo.environ as pyo\r\nimport numpy as np\r\nimport pandas as pd\r\n\r\n\r\n# todo now the designs alternatives set is fixed in dimensions. This means that for example, each part has to have 3 design alternatives.\r\n# todo in the modelling a part can have only 2 alternatives in a 3 dimension set if one is repeated.\r\n# todo it would be best to defined a better set. In the meantime, this works.\r\n# todo maybe define the design alternatives as part of the architecture: arch1 can be the same as arch2 but with a diferent design alternative for a part\r\n\r\n# collection_processing_cost = pd.read_csv('collection_processing_cost.csv', delimiter=';', header=None)\r\n#\r\n# flow_cost_collection_centres_plants = pd.read_csv('flow_cost_collection_centres_plants.csv', delimiter=';', header = None)\r\n# flow_cost_collection_reprocessing = pd.read_csv('flow_cost_collection_reprocessing.csv', delimiter=';', header = None)\r\n# flow_cost_reprocessing_disposal = pd.read_csv('flow_cost_reprocessing_disposal.csv', delimiter=';', header = None)\r\n# flow_cost_reprocessing_plants = pd.read_csv('flow_cost_reprocessing_plants.csv', delimiter=';', header = None)\r\nflow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv', delimiter=';', header = None)\r\n#\r\n# product_design = pd.read_csv('product_design.csv', delimiter=';', header = None)\r\n# production_cost = pd.read_csv('production_cost.csv', delimiter=';', header = None)\r\n# R_imperatives_cost = pd.read_csv('R_imperatives_cost.csv', delimiter=';', header = None)\r\n# R_imperatives_possibility = pd.read_csv('R_imperatives_possibility.csv', delimiter=';', header = None)\r\nvirgin_material_purchasing_cost = pd.read_csv('virgin_material_purchasing_cost.csv', delimiter=';', header = None)\r\n\r\n\r\n\r\n# todo remove periods\r\n# add reuse flow\r\n# create instance\r\n# add index to X for the design alternative\r\n# add architecture index to capacities\r\n# different cost for archtecture in dissambly\r\n\r\n# define the size of each set\r\nsupplier_number = 3\r\nplants_number = 2\r\nretailers_number = 1\r\ncustomers_number = 3\r\ncollection_centres_number = 3\r\ndisassembly_centres_number = 3\r\nremanufacturing_centres_number = 3\r\nparts_number = 2\r\nperiods_number = 4\r\narchitecture_number = 2\r\nr_imperatives_names = ['refurbishing', 'remanufacturing', 'recycling']\r\nr_imperatives_number = len(r_imperatives_names)\r\ndesigns_number = 2 # for each part, two designs\r\n\r\nbig_m = 100000 # todo find a good big m\r\n\r\n\r\n# create lists of using the number of each set\r\nsupplier_list = list(range(0, supplier_number))\r\nplants_list = list(range(0, plants_number))\r\nretailers_list = list(range(0, retailers_number))\r\ncustomers_list = list(range(0, customers_number))\r\ncollection_centres_list = list(range(0,collection_centres_number))\r\ndisassembly_centres_list = list(range(0,disassembly_centres_number))\r\nremanufacturing_centres_list = list(range(0, remanufacturing_centres_number))\r\nparts_list = list(range(0, parts_number))\r\nperiods_list = list(range(0, periods_number))\r\narchitecture_list = list(range(0, architecture_number))\r\nr_imperatives_list = list(range(0, r_imperatives_number))\r\ndesigns_list = list(range(0, designs_number))\r\n\r\n\r\n# parameters\r\nnp.random.seed(1048596)\r\n# Initialize capacities with random values within a sensible range\r\nsuppliers_capacity = np.random.randint(400, 500, (supplier_number, parts_number))\r\nplants_capacity = np.random.randint(500, 800, (plants_number))\r\n# retailers_capacity = np.random.randint(300, 600, (retailers_number))\r\nretailer_demand = np.random.randint(2, 3, (retailers_number))\r\ncollection_centres_capacity = np.random.randint(100, 500, (collection_centres_number))\r\ndisassembly_centres_capacity = np.random.randint(100, 400, (disassembly_centres_number, parts_number))\r\nremanufacturing_centres_capacity = np.random.randint(100, 300, (remanufacturing_centres_number, parts_number))\r\n\r\nflow_cost_suppliers_plants = np.random.randint(1, 100, (supplier_number, plants_number)) # suppliers as rows, plants as columns\r\nflow_cost_plants_retailers = np.random.randint(1, 100, (plants_number, retailers_number))\r\nflow_cost_retailers_customers = np.random.randint(1, 50, (retailers_number, customers_number))\r\nflow_cost_customers_collection_centres = np.random.randint(1, 50, (customers_number, collection_centres_number))\r\nflow_cost_collection_centres_disassembly = np.random.randint(1, 100, (collection_centres_number, disassembly_centres_number))\r\nflow_cost_collection_centres_plants = np.random.randint(1, 100, (collection_centres_number, plants_number))\r\nflow_cost_disassembly_disposal = np.random.randint(1, 100, (collection_centres_number))\r\nflow_cost_disassembly_remanufacturing_centres = np.random.randint(1, 100, (disassembly_centres_number, remanufacturing_centres_number))\r\nflow_cost_remanufacturing_centre_plants = np.random.randint(1, 100, (remanufacturing_centres_number, plants_number))\r\n\r\n\r\n\r\n\r\n\r\n\r\n# Initialize other parameters with random or specified values\r\nparts_of_architecture = np.random.randint(0, 3, (architecture_number, parts_number)) # rows are the architectures and columns are the part, replaces the r parameter in the model\r\nr_imperatives_of_architecture = np.random.randint(0, 2, (architecture_number, r_imperatives_number)) # rows are architectures and columns the part. It has a value of 1 if the r-imperative is possible with the architecutre\r\nr_imperatives_of_designs = np.random.randint(0, 2, (designs_number, r_imperatives_number)) # rows are designs and columns the part. It has a value of 1 if the r-imperative is possible with the design\r\ndesigns_of_architecture = np.random.randint(0, 2, (architecture_number, designs_number)) # rows are architecture and columns the design. It has a value of 1 if the design is possible with the architecture\r\ndesigns_of_parts = np.random.randint(1, 2, (parts_number, designs_number)) # rows are parts and columns the design. It has a value of 1 if the design is possible with the part\r\n\r\n\r\nalpha = np.random.rand(plants_number)\r\nbeta = np.random.rand(retailers_number)\r\nt_cost = 10  # A given constant for transportation cost or time, for example\r\nnu = 0.2  # Recycling rate, for example\r\nsigma = 0.1  # Breakage rate, for example\r\nlamda = 0.1  # Loss rate, for example\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n# start the model\r\nmodel = pyo.ConcreteModel()\r\n\r\n# create the sets of the model using the  pyomo\r\nmodel.suppliers = pyo.Set(initialize=supplier_list) # index i\r\nmodel.plants = pyo.Set(initialize=plants_list) # index j\r\nmodel.retailers = pyo.Set(initialize=retailers_list) # index k\r\n# model.customers = pyo.Set(initialize=customers_list) # index l\r\nmodel.collection_centres = pyo.Set(initialize=collection_centres_list) # index m\r\nmodel.disassembly_centres = pyo.Set(initialize=disassembly_centres_list) # index d\r\nmodel.remanufacturing_centres = pyo.Set(initialize=remanufacturing_centres_list) # index r\r\nmodel.parts = pyo.Set(initialize=parts_list) # index c\r\nmodel.periods = pyo.Set(initialize=periods_list) # index p\r\nmodel.architectures = pyo.Set(initialize=architecture_list) # index a, available architectures\r\nmodel.r_imperatives = pyo.Set(initialize=r_imperatives_list) #  index e, possible r imperatives\r\nmodel.design_alternatives = pyo.Set(initialize=designs_list) # index s, possible designs that can be used in parts\r\n\r\n\r\n# Define the  variables of the model\r\n\r\n# continuous variables\r\nmodel.x = pyo.Var(model.suppliers, model.plants, model.parts, domain= pyo.NonNegativeReals) # flow from suppliers to plants\r\nmodel.y = pyo.Var(model.plants,model.retailers, domain= pyo.NonNegativeReals) # flow from plants to retailers\r\n# model.z = pyo.Var(model.retailers,model.customers, domain= pyo.NonNegativeReals) # flow from retailers to customers\r\nmodel.w = pyo.Var(model.retailers,model.collection_centres, domain= pyo.NonNegativeReals) # flow from customers to collection centres\r\nmodel.a = pyo.Var(model.collection_centres, model.plants, domain= pyo.NonNegativeReals) # flow from collection/dissasembly centres to plants\r\nmodel.b = pyo.Var(model.collection_centres, model.retailers, domain= pyo.NonNegativeReals) # flow from collection/dissasembly centres to retailers\r\nmodel.d = pyo.Var(model.disassembly_centres, domain=pyo.NonNegativeReals) # flow from from collection/dissasembly centres to disposal\r\nmodel.f = pyo.Var(model.collection_centres, model.remanufacturing_centres, model.parts, domain=pyo.NonNegativeReals) # flow from collection/dissasembly centres to remanufacturing centres\r\n\r\n# divided the e flow into e_rf, e_rm and e_r (refurbishing, remanufacturing and recycling)\r\nmodel.erf = pyo.Var(model.disassembly_centres, model.remanufacturing_centres, model.parts, domain=pyo.NonNegativeReals) # flow from disassembly centre to remanufacturing centres due to refurbishing\r\nmodel.erm = pyo.Var(model.disassembly_centres, model.remanufacturing_centres, model.parts, domain=pyo.NonNegativeReals) # flow from disassembly centre to remanufacturing centre due to remanufacturing\r\nmodel.er = pyo.Var(model.disassembly_centres, model.remanufacturing_centres, model.parts, domain=pyo.NonNegativeReals) # flow from disassembly centre to remanufacturing centre due to recycling\r\n# binary variables # todo add these kind of variables for the rest of the relevant nodes\r\nmodel.h = pyo.Var(model.plants, domain=pyo.Binary) # if plant j is open at period p\r\nmodel.g = pyo.Var(model.retailers, domain=pyo.Binary) # if retailer r is open at period p\r\n\r\n\r\n\r\nmodel.ar = pyo.Var(model.architectures, domain= pyo.Binary) # binary, 1 if the product follows architecture a\r\nmodel.de = pyo.Var(model.design_alternatives, model.parts, domain= pyo.Binary) # 1 if the design alternative s is used for part c\r\n\r\nmodel.rimp = pyo.Var(model.r_imperatives, domain=pyo.Binary) # if r imperative e is possible\r\n\r\n# variable to define the save the objective function value (just to have a nice code)\r\nmodel.objective_variable = pyo.Var(domain=pyo.NonNegativeReals)\r\n\r\n# objective function\r\nmodel.objective = pyo.Objective(expr=model.objective_variable, sense=pyo.minimize)\r\n\r\n# Constraints\r\n\r\nmodel.objective_relationship = pyo.ConstraintList()\r\nmodel.objective_relationship.add(\r\n    # transport costs (the distances matrices must be in cost units)\r\n    sum(model.x[i,j,c] * flow_cost_suppliers_plants[i,j] for i in model.suppliers for j in model.plants for c in model.parts)\r\n    + sum(model.y[j,k] * flow_cost_plants_retailers[j,k] for j in model.plants for k in model.retailers )\r\n    + sum(model.z[k,l] * flow_cost_retailers_customers[k,l] for k in model.retailers for l in model.customers )\r\n    + sum(model.w[l,m] * flow_cost_customers_collection_centres[l,m] for l in model.customers for m in model.collection_centres )\r\n    + sum(model.a[m,j] * flow_cost_collection_centres_plants[m,j] for m in model.collection_centres for j in model.plants )\r\n    + sum(model.b[m,d] * flow_cost_collection_centres_disassembly[m,d] for m in model.collection_centres for d in model.disassembly_centres )\r\n    + sum(model.d[d,c] * flow_cost_disassembly_disposal[d] for d in model.disassembly_centres for c in model.parts )\r\n    + sum(model.erf[d,r,c] * flow_cost_disassembly_remanufacturing_centres[d,r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts )\r\n    + sum(model.erm[d,r,c] * flow_cost_disassembly_remanufacturing_centres[d, r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts )\r\n    + sum(model.er[d,r,c] * flow_cost_disassembly_remanufacturing_centres[d, r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts )\r\n    + sum(model.f[r,j,c] * flow_cost_remanufacturing_centre_plants[r,j] for r in model.remanufacturing_centres for j in model.plants for c in model.parts )\r\n\r\n    # opening costs\r\n    + sum(model.h[j] * alpha[j] for j in model.plants )\r\n    + sum(model.g[k] * beta[k] for k in model.retailers )\r\n\r\n    <= model.objective_variable)\r\n\r\n\r\n# # constraint 1: capacity of suppliers\r\nmodel.capacity_suppliers_constraints = pyo.ConstraintList()\r\nfor i in model.suppliers:\r\n    for c in model.parts:\r\n            model.capacity_suppliers_constraints.add(sum(model.x[i,j,c] for j in model.plants) <= suppliers_capacity[i,c])\r\n\r\n\r\n# constraint 2: capacity of plants\r\nmodel.capacity_plants_constraints = pyo.ConstraintList()\r\nfor j in model.plants:\r\n        model.capacity_plants_constraints.add(sum(model.y[j,k] for k in model.retailers) <= plants_capacity[j]*model.h[j])\r\n\r\n# constraint 3: demand of retailers\r\nmodel.demand_retailers_constraints = pyo.ConstraintList()\r\nfor k in model.retailers:\r\n        model.demand_retailers_constraints.add(sum(model.w[k,m] for m in model.collection_centres) >= retailer_demand[k])\r\n\r\n# constraint 4: capacity of the collection/disassembly centre\r\nmodel.capacity_collection_centres_constraints = pyo.ConstraintList()\r\nfor m in model.collection_centres:\r\n    for s in model.design_alternatives:\r\n        for c in model.parts:\r\n            for a in model.architectures:\r\n                model.capacity_collection_centres_constraints.add((sum(model.a[m, j] for j in model.plants)\r\n                                                                   + sum(model.b[m, k] for k in model.retailers)\r\n                                                                   + model.d[m]) * model.ar[a] * parts_of_architecture[a,c]\r\n                                                                  + sum(model.f[m, r, c] for r in\r\n                                                                        model.remanufacturing_centres)\r\n                                                                  <= collection_centres_capacity[m, c])\r\n\r\n\r\n# constraint 5: capacity of the refurbishing centres\r\nmodel.remanufacturing_centres_capacity_constraints = pyo.ConstraintList()\r\nfor r in model.remanufacturing_centres:\r\n    for c in model.parts:\r\n            model.remanufacturing_centres_capacity_constraints.add(sum(model.erf[r,j,c] for j in model.plants)\r\n                                                               + sum(model.erm[r,j,c] for j in model.plants)\r\n                                                               + sum(model.er[r,j,c] for j in model.plants)\r\n                                                               <= remanufacturing_centres_capacity[r,c])\r\n\r\n\r\n\r\n# constraint 11\r\nmodel.customer_demand_constraints = pyo.ConstraintList()\r\nfor l in model.customers:\r\n        model.customer_demand_constraints.add(sum(model.z[k,l] for k in model.retailers) >= retailer_demand[l])\r\n\r\n\r\n# constraint 14\r\nmodel.plants_flow = pyo.ConstraintList()\r\nfor j in model.plants:\r\n    for c in model.parts:\r\n        for s in model.design_alternatives:\r\n                model.plants_flow.add(sum(model.x[i,j,s] for i in model.suppliers)\r\n                                      + sum(model.f[r,j,c] for r in model.remanufacturing_centres)\r\n                                      + sum(parts_of_architecture[a,c] * model.ar[a] * model.a[m,j] for a in model.architectures for m in model.collection_centres)\r\n                                      - sum(parts_of_architecture[a,c] * model.ar[a] * model.y[j,k] for a in model.architectures for k in model.retailers)\r\n                                      == 0 )\r\n# constraint 15\r\nmodel.retailers_flow = pyo.ConstraintList()\r\nfor k in model.retailers:\r\n    for p in model.periods:\r\n        model.retailers_flow.add(sum(model.y[j,k] for j in model.plants)\r\n                                 - sum(model.z[k,l] for l in model.customers)\r\n                                 == 0)\r\n\r\n# constraint 16\r\n\r\nmodel.customers_flow = pyo.ConstraintList()\r\nfor l in model.customers:\r\n        model.customers_flow.add(nu * sum(model.z[k,l] for k in model.retailers)\r\n                                 - sum(model.w[l,m] for m in model.collection_centres)\r\n                                 == 0)\r\n\r\n# constraint 17\r\nmodel.collections_centres_flow = pyo.ConstraintList()\r\nfor m in model.collection_centres:\r\n        model.collections_centres_flow.add(sigma * sum(model.w[l,m] for l in model.customers)\r\n                                 - sum(model.a[m,j] for j in model.plants)\r\n                                 == 0)\r\n\r\n# constraint 18\r\nfor m in model.collection_centres:\r\n        model.collections_centres_flow.add((1-sigma) * sum(model.w[l,m] for l in model.customers)\r\n                                - sum(model.b[m,d] for d in model.disassembly_centres)\r\n                                == 0 )\r\n\r\n# constraint 19\r\nmodel.disassembly_centres_flow = pyo.ConstraintList()\r\nfor d in model.disassembly_centres:\r\n    for c in model.parts:\r\n            model.disassembly_centres_flow.add(lamda * sum(parts_of_architecture[a,c] * model.ar[a]* model.b[m,d] for a in model.architectures for m in model.collection_centres)\r\n                                                - model.d[d,c]\r\n                                                == 0 )\r\n\r\n# constraint 20\r\nfor d in model.disassembly_centres:\r\n    for c in model.parts:\r\n            model.disassembly_centres_flow.add((1-lamda) * sum(parts_of_architecture[a,c] * model.ar[a] * model.b[m,d] for a in model.architectures for m in model.collection_centres)\r\n                                               - sum(model.erf[d,r,c] for r in model.remanufacturing_centres)\r\n                                               - sum(model.erm[d,r,c] for r in model.remanufacturing_centres)\r\n                                               - sum(model.er[d,r,c] for r in model.remanufacturing_centres)\r\n                                               == 0)\r\n\r\n# constraint 21\r\nmodel.remanufacturing_centres_flow = pyo.ConstraintList()\r\nfor r in model.remanufacturing_centres:\r\n    for c in model.parts:\r\n            model.remanufacturing_centres_flow.add(sum(model.erf[d,r,c] for d in model.disassembly_centres)\r\n                                                   + sum(model.erm[d,r,c] for d in model.disassembly_centres)\r\n                                                   + sum(model.er[d,r,c] for d in model.disassembly_centres)\r\n                                                   - sum(model.f[r,j,c] for j in model.plants)\r\n                                                   == 0)\r\n\r\n# constraints 22: we have to select one and only one architecture\r\nmodel.architecture_limits = pyo.ConstraintList()\r\nmodel.architecture_limits.add(sum(model.ar[a] for a in model.ar) == 1)\r\n\r\n# restrict the refurbishing flow if the r-imperative is not possible. Refurbishing has the index 0\r\nmodel.refurbishing_possible = pyo.ConstraintList()\r\nfor d in model.disassembly_centres:\r\n    for r in model.remanufacturing_centres:\r\n        for c in model.parts:\r\n                model.refurbishing_possible.add(model.erf[d,r,c] <= model.rimp[0])\r\n\r\n# restrict the remanufacturing flow if the r-imperative is not possible. Remanufacturing has the index 1\r\nmodel.remanufacturing_possible = pyo.ConstraintList()\r\nfor d in model.disassembly_centres:\r\n    for r in model.remanufacturing_centres:\r\n        for c in model.parts:\r\n                model.remanufacturing_possible.add(model.erm[d,r,c] <= model.rimp[1])\r\n\r\n# restrict the recycling flow if the r-imperative is not possible. Recycling has the index 2\r\nmodel.recycling_possible = pyo.ConstraintList()\r\nfor d in model.disassembly_centres:\r\n    for r in model.remanufacturing_centres:\r\n        for c in model.parts:\r\n                model.recycling_possible.add(model.erf[d,r,c] <= model.rimp[2])\r\n\r\n# restrict the r-imperative given the selection of architecture\r\nmodel.r_imperative_possible_architecture = pyo.ConstraintList()\r\nfor e in model.r_imperatives:\r\n    for a in model.architectures:\r\n        model.r_imperative_possible_architecture.add(model.rimp[e] * model.ar[a] <= r_imperatives_of_architecture[a,e]) #todo linearize this constraint\r\n\r\n# restrict the r-imperative given the selection of design\r\nmodel.r_imperative_possible_design = pyo.ConstraintList()\r\nfor e in model.r_imperatives:\r\n    for s in model.design_alternatives:\r\n        model.r_imperative_possible_design.add(model.rimp[e] * sum(model.de[s,c] for c in model.parts) <= r_imperatives_of_designs[s,e]) #todo linearize this constraint\r\n\r\n# relate the part ot a design, only one design can be selected for each part\r\nmodel.design_to_part = pyo.ConstraintList()\r\nfor c in model.parts:\r\n    model.design_to_part.add(sum(model.de[s,c]*designs_of_parts[c,s] for s in model.design_alternatives) == 1)\r\n\r\n\r\n\r\nmax_time = 25\r\nsolver = 'gurobi'\r\nopt = pyo.SolverFactory(solver)\r\nsolution = opt.solve(model)\r\n\r\n# form suppliers to plants\r\nfor i in model.suppliers:\r\n    for j in model.plants:\r\n        for c in model.parts:\r\n                # if model.x[i,j,c].value != 0:\r\n                    print(\"supplier:\",i,\"plant:\",j,\"part:\",c)\r\n                    print(model.x[i, j, c].value)\r\n\r\n\r\n# from plants to retailers\r\nfor j in model.plants:\r\n    for k in model.retailers:\r\n\r\n                # if model.y[j,k].value != 0:\r\n                    print(\"plant:\",j,\"retailer:\",k)\r\n                    print(model.y[j,k].value)\r\n\r\n# flows from retailers to customers\r\nfor k in model.retailers:\r\n    for l in model.customers:\r\n\r\n                # if model.z[k,l].value != 0:\r\n                    print(\"retailer:\",k,\"customer:\",l)\r\n                    print(model.z[k,l].value)\r\n\r\n\r\nmodel.objective_variable.value\r\n\r\n\r\n\r\n\r\n\r\n#\r\n# # Define function to convert numpy arrays to pandas DataFrame, save as CSV, and reload as DataFrame\r\n# def numpy_to_csv_and_reload(data, filename):\r\n#     # Convert to DataFrame\r\n#     df = pd.DataFrame(data)\r\n#     # Save to CSV\r\n#     csv_path = filename+'.csv'\r\n#     df.to_csv(csv_path, index=False)\r\n#     # Reload from CSV\r\n#     reloaded_df = pd.read_csv(csv_path)\r\n#     return reloaded_df, csv_path\r\n#\r\n# # Convert and reload each array as per the given example\r\n# flow_cost_suppliers_plants_df, flow_cost_suppliers_plants_path = numpy_to_csv_and_reload(flow_cost_suppliers_plants, 'flow_cost_suppliers_plants')\r\n# flow_cost_plants_retailers_df, flow_cost_plants_retailers_path = numpy_to_csv_and_reload(flow_cost_plants_retailers, 'flow_cost_plants_retailers')\r\n# flow_cost_retailers_customers_df, flow_cost_retailers_customers_path = numpy_to_csv_and_reload(flow_cost_retailers_customers, 'flow_cost_retailers_customers')\r\n# flow_cost_customers_collection_centres_df, flow_cost_customers_collection_centres_path = numpy_to_csv_and_reload(flow_cost_customers_collection_centres, 'flow_cost_customers_collection_centres')\r\n# flow_cost_collection_centres_disassembly_df, flow_cost_collection_centres_disassembly_path = numpy_to_csv_and_reload(flow_cost_collection_centres_disassembly, 'flow_cost_collection_centres_disassembly')\r\n# flow_cost_collection_centres_plants_df, flow_cost_collection_centres_plants_path = numpy_to_csv_and_reload(flow_cost_collection_centres_plants, 'flow_cost_collection_centres_plants')\r\n# flow_cost_disassembly_disposal_df, flow_cost_disassembly_disposal_path = numpy_to_csv_and_reload(flow_cost_disassembly_disposal, 'flow_cost_disassembly_disposal')\r\n# flow_cost_disassembly_remanufacturing_centres_df, flow_cost_disassembly_remanufacturing_centres_path = numpy_to_csv_and_reload(flow_cost_disassembly_remanufacturing_centres, 'flow_cost_disassembly_remanufacturing_centres')\r\n# flow_cost_remanufacturing_centre_plants_df, flow_cost_remanufacturing_centre_plants_path = numpy_to_csv_and_reload(flow_cost_remanufacturing_centre_plants, 'flow_cost_remanufacturing_centre_plants')\r\n#\r\n# # List of all saved file paths\r\n# saved_files_paths = [\r\n#     flow_cost_suppliers_plants_path,\r\n#     flow_cost_plants_retailers_path,\r\n#     flow_cost_retailers_customers_path,\r\n#     flow_cost_customers_collection_centres_path,\r\n#     flow_cost_collection_centres_disassembly_path,\r\n#     flow_cost_collection_centres_plants_path,\r\n#     flow_cost_disassembly_disposal_path,\r\n#     flow_cost_disassembly_remanufacturing_centres_path,\r\n#     flow_cost_remanufacturing_centre_plants_path,\r\n# ]\r\n#\r\n# saved_files_paths\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ b/main.py	(date 1715323124156)
+@@ -14,13 +14,13 @@
+ # flow_cost_collection_reprocessing = pd.read_csv('flow_cost_collection_reprocessing.csv', delimiter=';', header = None)
+ # flow_cost_reprocessing_disposal = pd.read_csv('flow_cost_reprocessing_disposal.csv', delimiter=';', header = None)
+ # flow_cost_reprocessing_plants = pd.read_csv('flow_cost_reprocessing_plants.csv', delimiter=';', header = None)
+-flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv', delimiter=';', header = None)
++# flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv', delimiter=';', header = None)
+ #
+ # product_design = pd.read_csv('product_design.csv', delimiter=';', header = None)
+ # production_cost = pd.read_csv('production_cost.csv', delimiter=';', header = None)
+ # R_imperatives_cost = pd.read_csv('R_imperatives_cost.csv', delimiter=';', header = None)
+ # R_imperatives_possibility = pd.read_csv('R_imperatives_possibility.csv', delimiter=';', header = None)
+-virgin_material_purchasing_cost = pd.read_csv('virgin_material_purchasing_cost.csv', delimiter=';', header = None)
++# virgin_material_purchasing_cost = pd.read_csv('virgin_material_purchasing_cost.csv', delimiter=';', header = None)
+ 
+ 
+ 
+@@ -68,39 +68,56 @@
+ np.random.seed(1048596)
+ # Initialize capacities with random values within a sensible range
+ suppliers_capacity = np.random.randint(400, 500, (supplier_number, parts_number))
++np.savetxt('suppliers_capacity.csv', suppliers_capacity, delimiter=",")
++
+ plants_capacity = np.random.randint(500, 800, (plants_number))
+-# retailers_capacity = np.random.randint(300, 600, (retailers_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ retailer_demand = np.random.randint(2, 3, (retailers_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ collection_centres_capacity = np.random.randint(100, 500, (collection_centres_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ disassembly_centres_capacity = np.random.randint(100, 400, (disassembly_centres_number, parts_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ remanufacturing_centres_capacity = np.random.randint(100, 300, (remanufacturing_centres_number, parts_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ 
+ flow_cost_suppliers_plants = np.random.randint(1, 100, (supplier_number, plants_number)) # suppliers as rows, plants as columns
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ flow_cost_plants_retailers = np.random.randint(1, 100, (plants_number, retailers_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ flow_cost_retailers_customers = np.random.randint(1, 50, (retailers_number, customers_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ flow_cost_customers_collection_centres = np.random.randint(1, 50, (customers_number, collection_centres_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ flow_cost_collection_centres_disassembly = np.random.randint(1, 100, (collection_centres_number, disassembly_centres_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ flow_cost_collection_centres_plants = np.random.randint(1, 100, (collection_centres_number, plants_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ flow_cost_disassembly_disposal = np.random.randint(1, 100, (collection_centres_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ flow_cost_disassembly_remanufacturing_centres = np.random.randint(1, 100, (disassembly_centres_number, remanufacturing_centres_number))
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ flow_cost_remanufacturing_centre_plants = np.random.randint(1, 100, (remanufacturing_centres_number, plants_number))
+-
+-
+-
+-
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ 
+ 
+ # Initialize other parameters with random or specified values
+ parts_of_architecture = np.random.randint(0, 3, (architecture_number, parts_number)) # rows are the architectures and columns are the part, replaces the r parameter in the model
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ r_imperatives_of_architecture = np.random.randint(0, 2, (architecture_number, r_imperatives_number)) # rows are architectures and columns the part. It has a value of 1 if the r-imperative is possible with the architecutre
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ r_imperatives_of_designs = np.random.randint(0, 2, (designs_number, r_imperatives_number)) # rows are designs and columns the part. It has a value of 1 if the r-imperative is possible with the design
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ designs_of_architecture = np.random.randint(0, 2, (architecture_number, designs_number)) # rows are architecture and columns the design. It has a value of 1 if the design is possible with the architecture
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ designs_of_parts = np.random.randint(1, 2, (parts_number, designs_number)) # rows are parts and columns the design. It has a value of 1 if the design is possible with the part
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ 
+ 
+ alpha = np.random.rand(plants_number)
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ beta = np.random.rand(retailers_number)
+-t_cost = 10  # A given constant for transportation cost or time, for example
++np.savetxt('plants_capacity.csv', plants_capacity, delimiter=",")
+ nu = 0.2  # Recycling rate, for example
+ sigma = 0.1  # Breakage rate, for example
+ lamda = 0.1  # Loss rate, for example
+Index: R_imperatives_cost.csv
+===================================================================
+diff --git a/R_imperatives_cost.csv b/R_imperatives_cost.csv
+deleted file mode 100644
+--- a/R_imperatives_cost.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,5 +0,0 @@
+-Reusing;1;16
+-Repairing;2;26
+-Remaufacturing;3;30
+-Repurposing;4;32
+-Recycling;4;35
+Index: flow_cost_reprocessing_plants.csv
+===================================================================
+diff --git a/flow_cost_reprocessing_plants.csv b/flow_cost_reprocessing_plants.csv
+deleted file mode 100644
+--- a/flow_cost_reprocessing_plants.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,4 +0,0 @@
+-;1;2
+-1;125;144
+-2;150;119
+-3;150;111
+Index: product_design.csv
+===================================================================
+diff --git a/product_design.csv b/product_design.csv
+deleted file mode 100644
+--- a/product_design.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,8 +0,0 @@
+-;;Battery;;Housing;;Chipset;;Antenna;
+-;;Chargeable;Non-chargeable;Destructive;Non-destructive;Programmable;Non-programmable;Fused metal ring;Module
+-;;1;2;3;4;6;7;8;9
+-Architecture 1;1;0;1;1;0;0;1;1;0
+-Architecture 2;2;1;0;1;0;0;1;1;0
+-Architecture 3;3;1;0;0;1;0;1;0;1
+-Architecture 4;4;1;0;0;1;1;0;0;1
+-Architecture 5;5;1;0;1;;1;0;0;1
+Index: R_imperatives_possibility.csv
+===================================================================
+diff --git a/R_imperatives_possibility.csv b/R_imperatives_possibility.csv
+deleted file mode 100644
+--- a/R_imperatives_possibility.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,5 +0,0 @@
+-;;Battery;;Housing;;Chipset;;Antenna;
+-;;Chargeable;Non-chargeable;Destructive;Non-destructive;Programmable;Non-programmable;Fused metal ring;Module
+-;;1;2;3;4;6;7;8;9
+-Remanufacturing;1;1;0;0;1;1;0;0;1
+-Recycling;2;1;1;1;1;0;0;1;1
+Index: flow_cost_collection_centres_plants.csv
+===================================================================
+diff --git a/flow_cost_collection_centres_plants.csv b/flow_cost_collection_centres_plants.csv
+deleted file mode 100644
+--- a/flow_cost_collection_centres_plants.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,4 +0,0 @@
+-;2;2
+-1;120;85
+-2;115;95
+-3;125;110
+Index: virgin_material_purchasing_cost.csv
+===================================================================
+diff --git a/virgin_material_purchasing_cost.csv b/virgin_material_purchasing_cost.csv
+deleted file mode 100644
+--- a/virgin_material_purchasing_cost.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,5 +0,0 @@
+-;Chargeable;Non-chargeable;Destructive;Non-destructive;Programmable;Non-programmable;Fused metal ring;Module
+-;1;2;3;4;6;7;8;9
+-1;120;85;49;52;270;244;56;65
+-2;135;80;44;59;259;221;53;71
+-3;112;80;40;51;264;250;42;72
+Index: collection_processing_cost.csv
+===================================================================
+diff --git a/collection_processing_cost.csv b/collection_processing_cost.csv
+deleted file mode 100644
+--- a/collection_processing_cost.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,3 +0,0 @@
+-1;45
+-2;60
+-3;51
+Index: flow_cost_collection_reprocessing.csv
+===================================================================
+diff --git a/flow_cost_collection_reprocessing.csv b/flow_cost_collection_reprocessing.csv
+deleted file mode 100644
+--- a/flow_cost_collection_reprocessing.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,4 +0,0 @@
+-;1;2;3
+-1;93;96;75
+-2;75;97;76
+-3;97;88;94
+Index: production_cost.csv
+===================================================================
+diff --git a/production_cost.csv b/production_cost.csv
+deleted file mode 100644
+--- a/production_cost.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,5 +0,0 @@
+-Architecture 1;1;320
+-Architecture 2;2;335
+-Architecture 3;3;340
+-Architecture 4;4;347
+-Architecture 5;5;350
+Index: flow_cost_suppliers_plants.csv
+===================================================================
+diff --git a/flow_cost_suppliers_plants.csv b/flow_cost_suppliers_plants.csv
+deleted file mode 100644
+--- a/flow_cost_suppliers_plants.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,4 +0,0 @@
+-;1;2
+-1;20;33
+-2;25;27
+-3;18;39
+Index: flow_cost_reprocessing_disposal.csv
+===================================================================
+diff --git a/flow_cost_reprocessing_disposal.csv b/flow_cost_reprocessing_disposal.csv
+deleted file mode 100644
+--- a/flow_cost_reprocessing_disposal.csv	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ /dev/null	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
+@@ -1,3 +0,0 @@
+-1;40
+-2;22
+-3;35
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"bb19bcf8-64ef-4ee7-9c7e-6dedd7458d72\" name=\"Changes\" comment=\"before design alternative set changes\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_04_2024_12_37_[Changes]/shelved.patch\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_04_2024_12_37__Changes_.xml\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_11_04_2024_08_29_[Changes]/shelved.patch\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_11_04_2024_08_29__Changes_.xml\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/main.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/main.py\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 3\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2ddEqCSVPHcaRw3mClCv8uhawTy\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;master&quot;,\r\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/juanp/PycharmProjects/CLSupplyChain&quot;,\r\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\r\n    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,\r\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\juanp\\PycharmProjects\\CLSupplyChain\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"main\" type=\"PythonConfigurationType\" factoryName=\"Python\" nameIsGenerated=\"true\">\r\n      <module name=\"CLSupplyChain\" />\r\n      <option name=\"ENV_FILES\" value=\"\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <EXTENSION ID=\"PythonCoverageRunConfigurationExtension\" runner=\"coverage.py\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/main.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-python-sdk-50da183f06c8-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13135.95\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"bb19bcf8-64ef-4ee7-9c7e-6dedd7458d72\" name=\"Changes\" comment=\"\" />\r\n      <created>1710329743560</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1710329743560</updated>\r\n      <workItem from=\"1710329747303\" duration=\"4745000\" />\r\n      <workItem from=\"1710341740303\" duration=\"1238000\" />\r\n      <workItem from=\"1710345133107\" duration=\"616000\" />\r\n      <workItem from=\"1710412277846\" duration=\"9622000\" />\r\n      <workItem from=\"1710490340692\" duration=\"417000\" />\r\n      <workItem from=\"1710496257477\" duration=\"5385000\" />\r\n      <workItem from=\"1710509281839\" duration=\"5142000\" />\r\n      <workItem from=\"1710755756923\" duration=\"37000\" />\r\n      <workItem from=\"1710759668742\" duration=\"365000\" />\r\n      <workItem from=\"1710761263028\" duration=\"6554000\" />\r\n      <workItem from=\"1710775562783\" duration=\"4000\" />\r\n      <workItem from=\"1711222723202\" duration=\"8797000\" />\r\n      <workItem from=\"1711375127971\" duration=\"2010000\" />\r\n      <workItem from=\"1711538140118\" duration=\"8000\" />\r\n      <workItem from=\"1712051296978\" duration=\"1245000\" />\r\n      <workItem from=\"1712227650560\" duration=\"876000\" />\r\n      <workItem from=\"1712230538708\" duration=\"5362000\" />\r\n      <workItem from=\"1712312904620\" duration=\"1050000\" />\r\n      <workItem from=\"1712579701263\" duration=\"76000\" />\r\n      <workItem from=\"1712651172726\" duration=\"4238000\" />\r\n      <workItem from=\"1712656879754\" duration=\"8842000\" />\r\n      <workItem from=\"1712743550596\" duration=\"237000\" />\r\n      <workItem from=\"1713447766155\" duration=\"3223000\" />\r\n      <workItem from=\"1713519387685\" duration=\"946000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"first commit\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1711375216049</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1711375216049</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"running\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1711376278905</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1711376278905</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"before design alternative set changes\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1712652678405</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1712652678405</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"before design alternative set changes\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1712657126695</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1712657126695</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"before design alternative set changes\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1712657195509</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1712657195509</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"before design alternative set changes\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1712658078776</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1712658078776</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"before design alternative set changes\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1712658742848</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1712658742848</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"before design alternative set changes\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1712661460393</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1712661460393</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00009\" summary=\"before design alternative set changes\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1713447973502</created>\r\n      <option name=\"number\" value=\"00009\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1713447973502</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"10\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"first commit\" />\r\n    <MESSAGE value=\"running\" />\r\n    <MESSAGE value=\"before design alternative set changes\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"before design alternative set changes\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ b/.idea/workspace.xml	(date 1715323124191)
+@@ -5,12 +5,21 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="bb19bcf8-64ef-4ee7-9c7e-6dedd7458d72" name="Changes" comment="before design alternative set changes">
+-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_04_2024_12_37_[Changes]/shelved.patch" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_04_2024_12_37__Changes_.xml" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_11_04_2024_08_29_[Changes]/shelved.patch" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_11_04_2024_08_29__Changes_.xml" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/CLSupplyChain.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CLSupplyChain.iml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/R_imperatives_cost.csv" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/R_imperatives_possibility.csv" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/collection_processing_cost.csv" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/flow_cost_collection_centres_plants.csv" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/flow_cost_collection_reprocessing.csv" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/flow_cost_reprocessing_disposal.csv" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/flow_cost_reprocessing_plants.csv" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/flow_cost_suppliers_plants.csv" beforeDir="false" />
+       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/product_design.csv" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/production_cost.csv" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/virgin_material_purchasing_cost.csv" beforeDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -40,6 +49,7 @@
+   &quot;keyToString&quot;: {
+     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+     &quot;last_opened_file_path&quot;: &quot;C:/Users/juanp/PycharmProjects/CLSupplyChain&quot;,
+     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+@@ -59,7 +69,6 @@
+   <component name="RunManager">
+     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+       <module name="CLSupplyChain" />
+-      <option name="ENV_FILES" value="" />
+       <option name="INTERPRETER_OPTIONS" value="" />
+       <option name="PARENT_ENVS" value="true" />
+       <envs>
+@@ -120,6 +129,9 @@
+       <workItem from="1712743550596" duration="237000" />
+       <workItem from="1713447766155" duration="3223000" />
+       <workItem from="1713519387685" duration="946000" />
++      <workItem from="1715282344575" duration="585000" />
++      <workItem from="1715322469001" duration="5000" />
++      <workItem from="1715322486756" duration="630000" />
+     </task>
+     <task id="LOCAL-00001" summary="first commit">
+       <option name="closed" value="true" />
+Index: .idea/CLSupplyChain.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<module type=\"PYTHON_MODULE\" version=\"4\">\r\n  <component name=\"NewModuleRootManager\">\r\n    <content url=\"file://$MODULE_DIR$\">\r\n      <excludeFolder url=\"file://$MODULE_DIR$/.venv\" />\r\n    </content>\r\n    <orderEntry type=\"inheritedJdk\" />\r\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\r\n  </component>\r\n</module>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/CLSupplyChain.iml b/.idea/CLSupplyChain.iml
+--- a/.idea/CLSupplyChain.iml	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ b/.idea/CLSupplyChain.iml	(date 1715282447000)
+@@ -4,7 +4,7 @@
+     <content url="file://$MODULE_DIR$">
+       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+     </content>
+-    <orderEntry type="inheritedJdk" />
++    <orderEntry type="jdk" jdkName="Python 3.9" jdkType="Python SDK" />
+     <orderEntry type="sourceFolder" forTests="false" />
+   </component>
+ </module>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"Black\">\r\n    <option name=\"sdkName\" value=\"Python 3.12 (CLSupplyChain)\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" project-jdk-name=\"Python 3.12 (CLSupplyChain)\" project-jdk-type=\"Python SDK\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 70e5cd6c2f5a807507ac51dc4977cdb3798bfbf2)
++++ b/.idea/misc.xml	(date 1715282447009)
+@@ -1,7 +1,4 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="Black">
+-    <option name="sdkName" value="Python 3.12 (CLSupplyChain)" />
+-  </component>
+-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (CLSupplyChain)" project-jdk-type="Python SDK" />
++  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9" project-jdk-type="Python SDK" />
+ </project>
+\ No newline at end of file
