@@ -23,14 +23,14 @@ import pandas as pd
 
 
 # define the size of each set
-supplier_number = 1
-plants_number = 1
-retailers_number = 1
+supplier_number = 20
+plants_number = 20
+retailers_number = 10
 customers_number = 1
-collection_centres_number = 1
-disassembly_centres_number = 1
+collection_centres_number = 10
+disassembly_centres_number = 10
 remanufacturing_centres_number = 1
-parts_number = 1
+parts_number = 3
 periods_number = 4
 architecture_number = 2
 r_imperatives_names = ['refurbishing', 'remanufacturing', 'recycling', 'reusing', 'repacking'] # assuming A is repacking and B is reusing. If not, switch names here.
@@ -81,6 +81,9 @@ flow_cost_plants_retailers = np.random.randint(1, 100, (plants_number, retailers
 np.savetxt('flow_cost_plants_retailers.csv', flow_cost_plants_retailers, delimiter=",")
 flow_cost_retailers_collection_centres = np.random.randint(1, 50, (retailers_number, collection_centres_number))
 np.savetxt('flow_cost_retailers_collection_centres.csv', flow_cost_retailers_collection_centres, delimiter=",")
+flow_cost_collection_retailer = np.random.randint(1, 50, (collection_centres_number, retailers_number))
+np.savetxt('flow_cost_collection_retailer.csv', flow_cost_collection_retailer, delimiter=",")
+
 flow_cost_collection_centres_remanufacturing = np.random.randint(1, 100, (collection_centres_number, remanufacturing_centres_number))
 np.savetxt('flow_cost_collection_centres_remanufacturing.csv', flow_cost_collection_centres_remanufacturing, delimiter=",")
 
@@ -188,12 +191,12 @@ model.objective_relationship.add(
     + sum(model.w[k,m,p] * flow_cost_retailers_collection_centres[k,m] for k in model.retailers for m in model.collection_centres for p in model.periods)
     # collection centres costs
     + sum(model.a[m,j,p] * flow_cost_collection_centres_plants[m,j] for m in model.collection_centres for j in model.plants for p in model.periods)
-    + sum(model.b[m,k,p] * flow_cost_collection_centres_remanufacturing[m,k] for m in model.collection_centres for k in model.retailers for p in model.periods)
+    + sum(model.b[m,k,p] * flow_cost_collection_retailer[m,k] for m in model.collection_centres for k in model.retailers for p in model.periods)
     + sum(model.f[m,r,c,p] * flow_cost_collection_centres_remanufacturing[m,r] for m in model.collection_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
     # reprocessing centre costs
-    + sum(model.erf[d,r,c,p] * flow_cost_remanufacturing_refurbishing[d,r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
-    + sum(model.er[d,r,c,p] * flow_cost_remanufacturing_reclycling[d,r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
-    + sum(model.erm[d,r,c,p] * flow_cost_remanufacturing_remanufacturing[d,r] for d in model.disassembly_centres for r in model.remanufacturing_centres for c in model.parts for p in model.periods)
+    + sum(model.erf[r,j,c,p] * flow_cost_remanufacturing_refurbishing[r,j] for r in model.remanufacturing_centres for j in model.plants for c in model.parts for p in model.periods)
+    + sum(model.er[r,j,c,p] * flow_cost_remanufacturing_reclycling[r,j] for r in model.remanufacturing_centres for j in model.plants for c in model.parts for p in model.periods)
+    + sum(model.erm[r,j,c,p] * flow_cost_remanufacturing_remanufacturing[r,j]  for r in model.remanufacturing_centres for j in model.plants for c in model.parts for p in model.periods)
 
     # opening costs
     + sum(model.opm[m] * opening_cost_collection[m] for m in model.collection_centres)
@@ -416,13 +419,13 @@ for m in model.collection_centres:
     for r in model.remanufacturing_centres:
         for c in model.parts:
             for p in model.periods:
-                model.opening_reprocessing_constraints.add(model.f[m,r,c,p] <= model.opr[m]*big_m)
+                model.opening_reprocessing_constraints.add(model.f[m,r,c,p] <= model.opr[r]*big_m)
 
 
 max_time = 25
 solver = 'gurobi'
 opt = pyo.SolverFactory(solver)
-solution = opt.solve(model)
+solution = opt.solve(model,timelimit = 5)
 
 # form suppliers to plants
 for i in model.suppliers:
