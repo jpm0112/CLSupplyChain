@@ -4,24 +4,6 @@ import pandas as pd
 
 
 
-# collection_processing_cost = pd.read_csv('collection_processing_cost.csv', delimiter=';', header=None)
-#
-# flow_cost_collection_centres_plants = pd.read_csv('flow_cost_collection_centres_plants.csv', delimiter=';', header = None)
-# flow_cost_collection_reprocessing = pd.read_csv('flow_cost_collection_reprocessing.csv', delimiter=';', header = None)
-# flow_cost_reprocessing_disposal = pd.read_csv('flow_cost_reprocessing_disposal.csv', delimiter=';', header = None)
-# flow_cost_reprocessing_plants = pd.read_csv('flow_cost_reprocessing_plants.csv', delimiter=';', header = None)
-# flow_cost_suppliers_plants = pd.read_csv('flow_cost_suppliers_plants.csv', delimiter=';', header = None)
-#
-# product_design = pd.read_csv('product_design.csv', delimiter=';', header = None)
-# production_cost = pd.read_csv('production_cost.csv', delimiter=';', header = None)
-# R_imperatives_cost = pd.read_csv('R_imperatives_cost.csv', delimiter=';', header = None)
-# R_imperatives_possibility = pd.read_csv('R_imperatives_possibility.csv', delimiter=';', header = None)
-# virgin_material_purchasing_cost = pd.read_csv('virgin_material_purchasing_cost.csv', delimiter=';', header = None)
-
-
-
-
-
 # define the size of each set
 
 #watch out when defining a value to one. The saving fucntion of the csv file may save a list rather than than matrix
@@ -62,7 +44,7 @@ designs_list = list(range(designs_number))
 
 
 
-# TO GENERATE CSVs
+# TO GENERATE CSVs, COMMENT THIS SECTION IF YOU WANT TO USE AN ISNTANCE FROM FILES
 # parameters
 np.random.seed(1048596)
 # Initialize capacities with random values within a sensible range

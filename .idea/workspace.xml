@@ -4,16 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb19bcf8-64ef-4ee7-9c7e-6dedd7458d72" name="Changes" comment="finished version">
-      <change afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/latex.tex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_10_2024_1_40_AM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_10_2024_1_40_AM__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/designs_of_architecture.csv" beforeDir="false" afterPath="$PROJECT_DIR$/designs_of_architecture.csv" afterDir="false" />
+    <list default="true" id="bb19bcf8-64ef-4ee7-9c7e-6dedd7458d72" name="Changes" comment="finished version with reading files">
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/r_imperatives_of_architecture.csv" beforeDir="false" afterPath="$PROJECT_DIR$/r_imperatives_of_architecture.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/r_imperatives_of_designs.csv" beforeDir="false" afterPath="$PROJECT_DIR$/r_imperatives_of_designs.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +20,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="jp_changes" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
@@ -132,7 +129,7 @@
       <workItem from="1715612125817" duration="571000" />
       <workItem from="1715921635046" duration="530000" />
       <workItem from="1716069351556" duration="2039000" />
-      <workItem from="1716071422742" duration="3511000" />
+      <workItem from="1716071422742" duration="3835000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -246,7 +243,31 @@
       <option name="project" value="LOCAL" />
       <updated>1715612699064</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="finished version with reading files">
+      <option name="closed" value="true" />
+      <created>1716075132713</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1716075132713</updated>
+    </task>
+    <task id="LOCAL-00016" summary="finished version with reading files">
+      <option name="closed" value="true" />
+      <created>1716075169938</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1716075169938</updated>
+    </task>
+    <task id="LOCAL-00017" summary="finished version with reading files">
+      <option name="closed" value="true" />
+      <created>1716075175099</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1716075175099</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -261,6 +282,7 @@
     <MESSAGE value="during changes" />
     <MESSAGE value="before design alternative set changes" />
     <MESSAGE value="finished version" />
-    <option name="LAST_COMMIT_MESSAGE" value="finished version" />
+    <MESSAGE value="finished version with reading files" />
+    <option name="LAST_COMMIT_MESSAGE" value="finished version with reading files" />
   </component>
 </project>
