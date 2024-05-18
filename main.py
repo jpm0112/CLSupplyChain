@@ -24,7 +24,7 @@ import pandas as pd
 
 # define the size of each set
 
-#todo watch out when defining a value to one. The saving fucntion of the csv file may save a list rather than than matrix
+#watch out when defining a value to one. The saving fucntion of the csv file may save a list rather than than matrix
 supplier_number = 20
 plants_number = 20
 retailers_number = 10
