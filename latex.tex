@@ -1,0 +1,221 @@
+\documentclass{article}
+\usepackage{amsmath}
+\begin{document}
+
+    \textbf{Sets and Indices:}
+    \begin{itemize}
+        \item Suppliers, indexed by \( i \)
+        \item Plants, indexed by \( j \)
+        \item Retailers, indexed by \( k \)
+        \item Collection centres, indexed by \( m \)
+        \item Disassembly centres, indexed by \( d \)
+        \item Remanufacturing centres, indexed by \( r \)
+        \item Parts, indexed by \( c \)
+        \item Periods, indexed by \( p \)
+        \item Architectures, indexed by \( a \)
+        \item R imperatives, indexed by \( e \)
+        \item Design alternatives, indexed by \( s \)
+        \\
+    \end{itemize}
+
+    \textbf{Parameters:}
+    \begin{itemize}
+        \item Flow cost from suppliers to plants \( \text{flow\_cost\_suppliers\_plants}[i,j] \)
+        \item Purchase cost from suppliers \( \text{purchase\_cost\_suppliers}[c,d] \)
+        \item Flow cost from plants to retailers \( \text{flow\_cost\_plants\_retailers}[j,k] \)
+        \item Flow cost from retailers to collection centres \( \text{flow\_cost\_retailers\_collection\_centres}[k,m] \)
+        \item Flow cost from collection centres to plants \( \text{flow\_cost\_collection\_centres\_plants}[m,j] \)
+        \item Flow cost from collection centres to retailers \( \text{flow\_cost\_collection\_retailer}[m,k] \)
+        \item Flow cost from collection centres to remanufacturing \( \text{flow\_cost\_collection\_centres\_remanufacturing}[m,r] \)
+        \item Flow cost from remanufacturing to refurbishing \( \text{flow\_cost\_remanufacturing\_refurbishing}[r,j] \)
+        \item Flow cost from remanufacturing to recycling \( \text{flow\_cost\_remanufacturing\_reclycling}[r,j] \)
+        \item Flow cost from remanufacturing to remanufacturing \( \text{flow\_cost\_remanufacturing\_remanufacturing}[r,j] \)
+        \
+        \item Opening cost for collection centres \( \text{opening\_cost\_collection}[m] \)
+        \item Opening cost for reprocessing centres \( \text{opening\_cost\_reprocessing}[r] \)
+        \item Opening cost for suppliers \( \text{opening\_cost\_supplier}[i] \)
+        \\
+    \end{itemize}
+
+    \textbf{Variables:}
+    \begin{itemize}
+        \item \( x[i,j,c,p] \): Flow from suppliers to plants
+        \item \( y[j,k,p] \): Flow from plants to retailers
+        \item \( w[k,m,p] \): Flow from retailers to collection centres
+        \item \( a[m,j,p] \): Flow from collection/disassembly centres to plants
+        \item \( b[m,k,p] \): Flow from collection/disassembly centres to retailers
+        \item \( dk[k,p] \): Disposal flow from retailers
+        \item \( dm[m,c,p] \): Disposal flow from collection/disassembly centres
+        \item \( f[m,r,c,p] \): Flow from collection/disassembly centres to remanufacturing centres
+        \item \( erf[r,j,c,p] \): Flow from disassembly centre to remanufacturing centres due to refurbishing
+        \item \( erm[r,j,c,p] \): Flow from disassembly centre to remanufacturing centres due to remanufacturing
+        \item \( er[r,j,c,p] \): Flow from disassembly centre to remanufacturing centres due to recycling
+        \item \( opm[m] \): Binary variable for opening collection centre \( m \)
+        \item \( opr[r] \): Binary variable for opening reprocessing centre \( r \)
+        \item \( ops[i] \): Binary variable for opening supplier \( i \)
+        \item \( ar[a] \): Binary variable, 1 if product follows architecture \( a \)
+        \item \( de[s,c] \): Binary variable, 1 if design alternative \( s \) is used for part \( c \)
+        \item \( rimp[e] \): Binary variable, if R imperative \( e \) is possible
+        \item \( monetary\_costs \): Variable to define the save the objective function value
+        \\
+    \end{itemize}
+
+
+    \textbf{Minimization Objective Function:}\\
+
+    \textbf{\( Min \): monetary\_costs}
+
+
+
+    \textbf{Objective Function Relationship:}
+    \[
+        \begin{aligned}
+            \text{monetary\_costs} \geq & \sum_{i,j,c,p} x[i,j,c,p] \cdot \text{flow\_cost\_suppliers\_plants}[i,j] + \\
+            & \sum_{i,j,c,p,d} x[i,j,c,p] \cdot \text{purchase\_cost\_suppliers}[c,d] + \\
+            & \sum_{j,k,p} y[j,k,p] \cdot \text{flow\_cost\_plants\_retailers}[j,k] + \\
+            & \sum_{k,m,p} w[k,m,p] \cdot \text{flow\_cost\_retailers\_collection\_centres}[k,m] + \\
+            & \sum_{m,j,p} a[m,j,p] \cdot \text{flow\_cost\_collection\_centres\_plants}[m,j] + \\
+            & \sum_{m,k,p} b[m,k,p] \cdot \text{flow\_cost\_collection\_retailer}[m,k] + \\
+            & \sum_{m,r,c,p} f[m,r,c,p] \cdot \text{flow\_cost\_collection\_centres\_remanufacturing}[m,r] + \\
+            & \sum_{r,j,c,p} erf[r,j,c,p] \cdot \text{flow\_cost\_remanufacturing\_refurbishing}[r,j] + \\
+            & \sum_{r,j,c,p} erm[r,j,c,p] \cdot \text{flow\_cost\_remanufacturing\_remanufacturing}[r,j] + \\
+            & \sum_{r,j,c,p} er[r,j,c,p] \cdot \text{flow\_cost\_remanufacturing\_reclycling}[r,j] + \\
+            & \sum_m opm[m] \cdot \text{opening\_cost\_collection}[m] + \\
+            & \sum_r opr[r] \cdot \text{opening\_cost\_reprocessing}[r] + \\
+            & \sum_i ops[i] \cdot \text{opening\_cost\_supplier}[i].
+        \end{aligned}
+    \]
+
+    \textbf{Capacity Constraints:}
+    \begin{itemize}
+        \item \textbf{constraint 1, Suppliers:}
+        \[
+            \sum_{j} x[i,j,c,p] \leq \text{suppliers\_capacity}[i,c], \quad \forall i, c, p
+        \]
+
+        \item \textbf{constraint 2, Plants:}
+        \[
+            \sum_{k} y[j,k,p] \leq \text{plants\_capacity}[j], \quad \forall j, p
+        \]
+
+        \item \textbf{constraint 4: Collection/Disassembly Centres:}
+        \[
+            \sum_{j,p} (a[m,j,p] + b[m,k,p]) \leq \text{collection\_centres\_capacity}[m,c] \cdot \text{opm}[m], \quad \forall m, c, p
+        \]
+
+        \item \textbf{constraint 5, Remanufacturing Centres:}
+        \[
+            \sum_{j,p} (erf[r,j,c,p] + erm[r,j,c,p] + er[r,j,c,p]) \leq \text{remanufacturing\_centres\_capacity}[r,c] \cdot \text{opr}[r], \quad \forall r, c, p
+        \]\\
+        \\
+        \\
+    \end{itemize}
+
+    \textbf{Flow Constraints:}
+    \begin{itemize}
+        \item \textbf{constraint 6, Plants:}
+        \[
+            \sum_{i,c,p} x[i,j,c,p] + \sum_{r,c,p} (erf[r,j,c,p] + erm[r,j,c,p] + er[r,j,c,p]) = \sum_{k,c,p} y[j,k,p], \quad \forall j
+        \]
+
+        \item \textbf{constraint 7, Retailers:}
+        \[
+            \sum_{j} y[j,k,p]  +\sum_{m} b[m,k,p] = \sum_{m} w[k,m,p]+ dk[k,p], \quad \forall k, p
+        \]
+
+        \item \textbf{constraint 8, Collection/Disassembly Centres:}
+        \[
+            \sum_{k,p} w[k,m,p] - \sum_{j,p} (a[m,j,p] + b[m,k,p]) = \sum_{r,c,p} f[m,r,c,p], \quad \forall m
+        \]
+        \item \textbf{constraint 9, flow of remanufacturing centres}
+        \[
+            \sum_{m} f[m,r,c,p] =  \sum_{j} (erf[r,j,c,p] + erm[r,j,c,p]+ er[r,j,c,p]), \quad \forall r,c,p
+        \]
+        \\
+        \\
+        \\
+
+    \end{itemize}
+
+
+
+
+
+
+    \textbf{Constraints 10 and 18, Selection of architecture and design Constraints:}
+    \[
+        \sum_a \text{ar}[a] = 1 \quad \text{(One and only one architecture must be selected)}
+    \]
+
+    \[
+        \sum_s \text{de}[s,c] = 1, \quad \forall c \quad \text{(One and only one design per part)}
+    \]
+    \\
+    \\
+    \\
+
+
+
+
+
+
+
+
+    \textbf{Other constraints:}
+
+
+    \begin{itemize}
+        \item \textbf{constraint 3, Demand Constraints for Retailers:}
+        \[
+            \sum_{j} y[j,k,p] \geq \text{retailer\_demand}[k,p], \quad \forall k, p
+        \]
+
+        \item \textbf{constraint ,Reusing Constraints:}
+        \[
+            \sum_{j} (a[m,j,p] + b[m,k,p]) \leq \sigma \cdot \sum_{k} w[k,m,p], \quad \forall m, p
+        \]
+
+        \item \textbf{Disposal Rate Constraints:}
+        \[
+            dm[m,c,p] \geq \lambda \cdot \sum_{k} w[k,m,p], \quad \forall m, c, p
+        \]
+
+        \item \textbf{Remanufacturing Rates:}
+        \[
+            \sum_{j,c} (erf[r,j,c,p] + erm[r,j,c,p]) \leq \beta \cdot \sum_{m,c} f[m,r,c,p], \quad \forall r, p
+        \]
+
+        \item \textbf{Refurbishing Constraints:}
+        \[
+            \sum_{j,c} erf[r,j,c,p] \leq \alpha \cdot \sum_{m,c} f[m,r,c,p], \quad \forall r, p
+        \]
+
+        \item \textbf{Opening Costs Constraints:}
+        \begin{align*}
+            w[k,m,p] &\leq \text{big\_m} \cdot \text{opm}[m], \quad \forall k, m, p \\
+            f[m,r,c,p] &\leq \text{big\_m} \cdot \text{opr}[r], \quad \forall m, r, c, p
+        \end{align*}
+
+        \item \textbf{Constraints 11 to 15, Restriction Constraints based on R Imperatives:}
+        \begin{align*}
+            \text{erf}[r,j,c,p] &\leq \text{rimp}[0] \cdot \text{big\_m}, \quad \text{(Refurbishing possible)} \\
+            \text{erm}[r,j,c,p] &\leq \text{rimp}[1] \cdot \text{big\_m}, \quad \text{(Remanufacturing possible)} \\
+            \text{er}[r,j,c,p] &\leq \text{rimp}[2] \cdot \text{big\_m}, \quad \text{(Recycling possible)} \\
+            b[m,k,p] &\leq \text{rimp}[3] \cdot \text{big\_m}, \quad \text{(Reusing possible)} \\
+            a[m,j,p] &\leq \text{rimp}[4] \cdot \text{big\_m}, \quad \text{(Repackaging possible)}
+        \end{align*}
+
+        \item \textbf{Design to Part Relations:}
+        \[
+            \sum_s de[s,c] \cdot \text{designs\_of\_parts}[c,s] = 1, \quad \forall c
+        \]
+
+        \item \textbf{Cosntraints 16 and 17, R Imperative Compliance with Architecture and Design:}
+        \begin{align*}
+            \text{rimp}[e] \cdot \text{ar}[a] &\leq \text{r\_imperatives\_of\_architecture}[a,e], \quad \forall e, a \\
+            \text{rimp}[e] \cdot \sum_c \text{de}[s,c] &\leq \text{r\_imperatives\_of\_designs}[s,e], \quad \forall e, s
+        \end{align*}
+    \end{itemize}
+
+
+\end{document}
