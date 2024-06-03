@@ -258,7 +258,7 @@ for m in model.collection_centres:
                                                                       <= collection_centres_capacity[m, c] * model.opm[m])
 
 
-# constraint 5: capacity of the reprocessing centres # todo individual capacities by r imperative
+# constraint 5: capacity of the reprocessing centres # todo individual capacities by r imperative?
 model.reprocessing_centres_capacity_constraints = pyo.ConstraintList()
 for r in model.reprocessing_centres:
     for c in model.components:
@@ -266,6 +266,7 @@ for r in model.reprocessing_centres:
             model.reprocessing_centres_capacity_constraints.add(sum(model.erp[r,j,c] for j in model.plants)
                                                                 + sum(model.erm[r,j,c] for j in model.plants)
                                                                 + sum(model.er[r,j,c] for j in model.plants)
+                                                                + sum(model.c[r, k] * bill_of_materials[a, c] for k in model.retailers for a in model.architectures)
                                                                 <= reprocessing_centres_capacity[r,c] * model.opr[r])
 
 
