@@ -55,8 +55,35 @@ retailer_demand = np.random.randint(200, 300, (retailers_number))
 np.savetxt('retailer_demand.csv', retailer_demand, delimiter=",")
 collection_centres_capacity = np.random.randint(300, 500, (collection_centres_number, components_number))
 np.savetxt('collection_centres_capacity.csv', collection_centres_capacity, delimiter=",")
-reprocessing_centres_capacity = np.random.randint(300, 400, (reprocessing_centres_number, components_number))
-np.savetxt('reprocessing_centres_capacity.csv', reprocessing_centres_capacity, delimiter=",")
+
+
+
+
+# reprocessing_centres_capacity = np.random.randint(300, 400, (reprocessing_centres_number, components_number))
+# np.savetxt('reprocessing_centres_capacity.csv', reprocessing_centres_capacity, delimiter=",")
+
+reprocessing_centres_capacity_repurposing = np.random.randint(300, 400, (reprocessing_centres_number, components_number))
+np.savetxt('reprocessing_centres_capacity_repurposing.csv', reprocessing_centres_capacity_repurposing, delimiter=",")
+
+reprocessing_centres_capacity_remanufacturing = np.random.randint(300, 400,(reprocessing_centres_number, components_number))
+np.savetxt('reprocessing_centres_capacity_remanufacturing.csv', reprocessing_centres_capacity_remanufacturing, delimiter=",")
+
+reprocessing_centres_capacity_recycling = np.random.randint(300, 400,(reprocessing_centres_number, components_number))
+np.savetxt('reprocessing_centres_capacity_recycling.csv', reprocessing_centres_capacity_recycling, delimiter=",")
+
+reprocessing_centres_capacity_refurbishing = np.random.randint(300, 400,  (reprocessing_centres_number, components_number))
+np.savetxt('reprocessing_centres_capacity_refurbishing.csv', reprocessing_centres_capacity_refurbishing, delimiter=",")
+
+
+
+
+
+
+
+
+
+
+
 
 flow_cost_suppliers_plants = np.random.randint(1, 100,(supplier_number, plants_number))  # suppliers as rows, plants as columns
 np.savetxt('flow_cost_suppliers_plants.csv', flow_cost_suppliers_plants, delimiter=",")
@@ -83,9 +110,16 @@ flow_cost_reprocessing_reclycling = np.random.randint(1, 100, (reprocessing_cent
 np.savetxt('flow_cost_reprocessing_reclycling.csv', flow_cost_reprocessing_reclycling, delimiter=",")
 flow_cost_reprocessing_remanufacturing = np.random.randint(1, 100, (reprocessing_centres_number, plants_number))
 np.savetxt('flow_cost_reprocessing_remanufacturing.csv', flow_cost_reprocessing_remanufacturing, delimiter=",")
-
 flow_cost_reprocessing_refurbishing = np.random.randint(1, 100, (reprocessing_centres_number, retailers_number))
 np.savetxt('flow_cost_reprocessing_refurbishing.csv', flow_cost_reprocessing_refurbishing, delimiter=",")
+
+
+
+
+
+
+
+
 
 
 
@@ -116,7 +150,14 @@ suppliers_capacity = np.loadtxt('suppliers_capacity.csv', delimiter=',')
 plants_capacity = np.loadtxt('plants_capacity.csv', delimiter=',')
 retailer_demand = np.loadtxt('retailer_demand.csv', delimiter=',')
 collection_centres_capacity = np.loadtxt('collection_centres_capacity.csv', delimiter=',')
-reprocessing_centres_capacity = np.loadtxt('reprocessing_centres_capacity.csv', delimiter=',')
+
+
+# reprocessing_centres_capacity = np.loadtxt('reprocessing_centres_capacity.csv', delimiter=',')
+
+flow_cost_reprocessing_repurposing = np.loadtxt('flow_cost_reprocessing_repurposing.csv', delimiter=',')
+flow_cost_reprocessing_reclycling = np.loadtxt('flow_cost_reprocessing_reclycling.csv', delimiter=',')
+flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_remanufacturing.csv', delimiter=',')
+flow_cost_reprocessing_refurbishing = np.loadtxt('flow_cost_reprocessing_refurbishing.csv', delimiter=',')
 
 flow_cost_suppliers_plants = np.loadtxt('flow_cost_suppliers_plants.csv', delimiter=',')
 purchase_cost_suppliers = np.loadtxt('purchase_cost_suppliers.csv', delimiter=',')
@@ -219,7 +260,6 @@ model.objective_relationship.add(
     + sum(model.er[r,j,c] * flow_cost_reprocessing_reclycling[r,j] for r in model.reprocessing_centres for j in model.plants for c in model.components )
     + sum(model.erm[r,j,c] * flow_cost_reprocessing_remanufacturing[r,j] for r in model.reprocessing_centres for j in model.plants for c in model.components )
     + sum(model.c[r,k] * flow_cost_reprocessing_refurbishing[r, k] for r in model.reprocessing_centres for k in model.retailers)
-    # todo add flow form reprocessing to retailers (another r imperative, repairing. refurbihsing)
     # opening costs
     + sum(model.opm[m] * opening_cost_collection[m] for m in model.collection_centres)
     + sum(model.opr[r] * opening_cost_reprocessing[r] for r in model.reprocessing_centres)
@@ -263,11 +303,22 @@ model.reprocessing_centres_capacity_constraints = pyo.ConstraintList()
 for r in model.reprocessing_centres:
     for c in model.components:
 
-            model.reprocessing_centres_capacity_constraints.add(sum(model.erp[r,j,c] for j in model.plants)
-                                                                + sum(model.erm[r,j,c] for j in model.plants)
-                                                                + sum(model.er[r,j,c] for j in model.plants)
-                                                                + sum(model.c[r, k] * bill_of_materials[a, c] for k in model.retailers for a in model.architectures)
-                                                                <= reprocessing_centres_capacity[r,c] * model.opr[r])
+            # model.reprocessing_centres_capacity_constraints.add(sum(model.erp[r,j,c] for j in model.plants)
+            #                                                     + sum(model.erm[r,j,c] for j in model.plants)
+            #                                                     + sum(model.er[r,j,c] for j in model.plants)
+            #                                                     + sum(model.c[r, k] * bill_of_materials[a, c] for k in model.retailers for a in model.architectures)
+            #                                                     <= reprocessing_centres_capacity[r,c] * model.opr[r])
+
+            model.reprocessing_centres_capacity_constraints.add(sum(model.erp[r, j, c] for j in model.plants)
+                                                                <= reprocessing_centres_capacity_repurposing[r, c] * model.opr[r])
+            model.reprocessing_centres_capacity_constraints.add(sum(model.erm[r, j, c] for j in model.plants)
+                                                                <= reprocessing_centres_capacity_remanufacturing[r, c] * model.opr[r])
+            model.reprocessing_centres_capacity_constraints.add(sum(model.er[r, j, c] for j in model.plants)
+                                                                <= reprocessing_centres_capacity_recycling[r, c] * model.opr[r])
+            model.reprocessing_centres_capacity_constraints.add(sum(model.c[r, k] * bill_of_materials[a, c] for k in model.retailers for a in model.architectures)
+                                                                <= reprocessing_centres_capacity_refurbishing[r, c] * model.opr[r])
+
+
 
 
 # constraint 6: flows of the plants
