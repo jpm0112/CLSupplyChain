@@ -24,6 +24,7 @@ big_m = 100000 # todo find a good big m
 alpha = 0.2
 beta = 0.3
 nu = 0.2  # percentage collected from the retailers
+# rates for the outgoing flows of the collection centres
 sigma = 0.1  # percentage from the collected product that is good enough for reusing or repackaging
 lamda = 0.1  # percentage of the collected product that has to be disposed
 
@@ -71,7 +72,7 @@ np.savetxt('reprocessing_centres_capacity_remanufacturing.csv', reprocessing_cen
 reprocessing_centres_capacity_recycling = np.random.randint(300, 400,(reprocessing_centres_number, components_number))
 np.savetxt('reprocessing_centres_capacity_recycling.csv', reprocessing_centres_capacity_recycling, delimiter=",")
 
-reprocessing_centres_capacity_refurbishing = np.random.randint(300, 400,  (reprocessing_centres_number, components_number))
+reprocessing_centres_capacity_refurbishing = np.random.randint(300, 400,  (reprocessing_centres_number))
 np.savetxt('reprocessing_centres_capacity_refurbishing.csv', reprocessing_centres_capacity_refurbishing, delimiter=",")
 
 
@@ -98,6 +99,10 @@ np.savetxt('flow_cost_collection_retailer.csv', flow_cost_collection_retailer, d
 
 flow_cost_collection_centres_reprocessing = np.random.randint(1, 100, (collection_centres_number, reprocessing_centres_number))
 np.savetxt('flow_cost_collection_centres_reprocessing.csv', flow_cost_collection_centres_reprocessing, delimiter=",")
+
+
+flow_cost_collection_centres_reprocessing_products = np.random.randint(1, 100,(collection_centres_number, reprocessing_centres_number))
+np.savetxt('flow_cost_collection_centres_reprocessing_products.csv', flow_cost_collection_centres_reprocessing_products, delimiter=",")
 
 flow_cost_collection_centres_plants = np.random.randint(1, 100, (collection_centres_number, plants_number))
 np.savetxt('flow_cost_collection_centres_plants.csv', flow_cost_collection_centres_plants, delimiter=",")
@@ -166,6 +171,7 @@ flow_cost_retailers_collection_centres = np.loadtxt('flow_cost_retailers_collect
 flow_cost_collection_retailer = np.loadtxt('flow_cost_collection_retailer.csv', delimiter=',')
 
 flow_cost_collection_centres_reprocessing = np.loadtxt('flow_cost_collection_centres_remanufacturing.csv', delimiter=',')
+flow_cost_collection_centres_reprocessing_products = np.loadtxt('flow_cost_collection_centres_reprocessing_products.csv',delimiter=',')
 flow_cost_collection_centres_plants = np.loadtxt('flow_cost_collection_centres_plants.csv', delimiter=',')
 flow_cost_disassembly_disposal = np.loadtxt('flow_cost_disassembly_disposal.csv', delimiter=',')
 flow_cost_reprocessing_repurposing = np.loadtxt('flow_cost_reprocessing_repurposing.csv', delimiter=',')
@@ -212,15 +218,16 @@ model.y = pyo.Var(model.plants,model.retailers,  domain= pyo.NonNegativeReals) #
 model.w = pyo.Var(model.retailers,model.collection_centres,  domain= pyo.NonNegativeReals) # flow from customers to collection centres
 model.a = pyo.Var(model.collection_centres, model.plants,  domain= pyo.NonNegativeReals) # flow from collection/dissasembly centres to plants
 model.b = pyo.Var(model.collection_centres, model.retailers,  domain= pyo.NonNegativeReals) # flow from collection/dissasembly centres to retailers
-model.dk = pyo.Var(model.retailers, domain=pyo.NonNegativeReals) # flow from from retailers to disposal
+model.dk = pyo.Var(model.retailers, domain=pyo.NonNegativeReals) # flow from retailers to disposal
 model.dm = pyo.Var(model.collection_centres, model.components,  domain=pyo.NonNegativeReals) # flow from from collection/dissasembly centres to disposal
-model.f = pyo.Var(model.collection_centres, model.reprocessing_centres, model.components,  domain=pyo.NonNegativeReals) # flow from collection/dissasembly centres to remanufacturing centres
+model.f = pyo.Var(model.collection_centres, model.reprocessing_centres, model.components,  domain=pyo.NonNegativeReals) # flow from collection/dissasembly centres to remanufacturing centres (components)
+model.g = pyo.Var(model.collection_centres, model.reprocessing_centres,domain=pyo.NonNegativeReals)  # flow from collection/dissasembly centres to remanufacturing centres (products)
 
 # divided the e flow into e_rf, e_rm and e_r (repurposing, remanufacturing and recycling)
 model.erp = pyo.Var(model.reprocessing_centres, model.plants, model.components,  domain=pyo.NonNegativeReals) # flow from reprocessing centre to plants centres due to repurposing
 model.erm = pyo.Var(model.reprocessing_centres, model.plants, model.components,  domain=pyo.NonNegativeReals) # flow from reprocessing centre to plants centre due to remanufacturing
 model.er = pyo.Var(model.reprocessing_centres, model.plants, model.components, domain=pyo.NonNegativeReals) # flow from reprocessing centre to plants centre due to recycling
-model.c = pyo.Var(model.reprocessing_centres, model.retailers, domain=pyo.NonNegativeReals)  # flow from reprocessing centre to retailers centres due to recycling
+model.c = pyo.Var(model.reprocessing_centres, model.retailers, domain=pyo.NonNegativeReals)  # flow from reprocessing centre to retailers centres due to refurbishing
 
 # binary variables
 model.opm = pyo.Var(model.collection_centres, domain=pyo.Binary) # if we open the collection center m
@@ -255,6 +262,7 @@ model.objective_relationship.add(
     + sum(model.a[m,j] * flow_cost_collection_centres_plants[m,j] for m in model.collection_centres for j in model.plants )
     + sum(model.b[m,k] * flow_cost_collection_retailer[m,k] for m in model.collection_centres for k in model.retailers )
     + sum(model.f[m,r,c] * flow_cost_collection_centres_reprocessing[m,r] for m in model.collection_centres for r in model.reprocessing_centres for c in model.components )
+    + sum(model.g[m, r] * flow_cost_collection_centres_reprocessing_products[m, r] for m in model.collection_centres for r in model.reprocessing_centres)
     # reprocessing centre costs
     + sum(model.erp[r,j,c] * flow_cost_reprocessing_repurposing[r,j] for r in model.reprocessing_centres for j in model.plants for c in model.components )
     + sum(model.er[r,j,c] * flow_cost_reprocessing_reclycling[r,j] for r in model.reprocessing_centres for j in model.plants for c in model.components )
@@ -267,6 +275,8 @@ model.objective_relationship.add(
 
     <= model.monetary_costs)
 
+
+#CAPACITY CONSTRAINTS
 
 # # constraint 1: capacity of suppliers
 model.capacity_suppliers_constraints = pyo.ConstraintList()
@@ -298,7 +308,7 @@ for m in model.collection_centres:
                                                                       <= collection_centres_capacity[m, c] * model.opm[m])
 
 
-# constraint 5: capacity of the reprocessing centres # todo individual capacities by r imperative?
+# constraint 5: capacity of the reprocessing centres
 model.reprocessing_centres_capacity_constraints = pyo.ConstraintList()
 for r in model.reprocessing_centres:
     for c in model.components:
@@ -315,11 +325,11 @@ for r in model.reprocessing_centres:
                                                                 <= reprocessing_centres_capacity_remanufacturing[r, c] * model.opr[r])
             model.reprocessing_centres_capacity_constraints.add(sum(model.er[r, j, c] for j in model.plants)
                                                                 <= reprocessing_centres_capacity_recycling[r, c] * model.opr[r])
-            model.reprocessing_centres_capacity_constraints.add(sum(model.c[r, k] * bill_of_materials[a, c] for k in model.retailers for a in model.architectures)
-                                                                <= reprocessing_centres_capacity_refurbishing[r, c] * model.opr[r])
+            model.reprocessing_centres_capacity_constraints.add(sum(model.c[r, k]  for k in model.retailers)
+                                                                <= reprocessing_centres_capacity_refurbishing[r] * model.opr[r])
 
 
-
+# FLOWS CONSTRAINTS
 
 # constraint 6: flows of the plants
 model.plants_flow = pyo.ConstraintList()
@@ -367,18 +377,18 @@ for r in model.reprocessing_centres:
                                                 - sum(model.erp[r,j,c] for j in model.plants)
                                                 - sum(model.erm[r,j,c] for j in model.plants)
                                                 - sum(model.er[r,j,c] for j in model.plants)
-                                                - sum(model.c[r,k] *bill_of_materials[a,c] for k in model.retailers for a in model.architectures)
                                                 == 0)
 
-# constraints 10: we have to select one and only one architecture
-model.architecture_limits = pyo.ConstraintList()
-model.architecture_limits.add(sum(model.ar[a] for a in model.ar) == 1)
+for r in model.reprocessing_centres:
+    model.reprocessing_centres_flow.add(sum(model.c[r, k] for k in model.retailers) == sum(model.g[m, r] for m in model.collection_centres))
 
 
 
 
 
 
+
+# restrict the flows with the rimp variable that describes if a certain architecture or desing alternative allows the r imperative
 
 # Constraint 11: restrict the repurpose flow if it is not possible
 # restrict the repurposing flow if the r-imperative is not possible. Repurposing has the index 0
@@ -423,7 +433,7 @@ for m in model.collection_centres:
                 model.repacking_possible.add(model.a[m,j] <= model.rimp[3]*big_m)
 
 # Constraint 15: restrict the repackaging flow if it is not possible
-# restrict the repacking flow if the r-imperative is not possible. refurbishing has the index 3
+# restrict the repacking flow if the r-imperative is not possible. refurbishing/repairing has the index 4
 model.refurbishing_possible = pyo.ConstraintList()
 for r in model.reprocessing_centres:
     for k in model.retailers:
@@ -433,6 +443,11 @@ for r in model.reprocessing_centres:
 
 
 
+
+
+# constraints 10: we have to select one and only one architecture
+model.architecture_limits = pyo.ConstraintList()
+model.architecture_limits.add(sum(model.ar[a] for a in model.ar) == 1)
 
 # constraint 16
 # restrict the r-imperative given the selection of architecture
@@ -454,12 +469,14 @@ model.design_to_part = pyo.ConstraintList()
 for c in model.components:
     model.design_to_part.add(sum(model.de[s,c] * designs_of_components[c,s] for s in model.design_alternatives) == 1)
 
+
+
+# RATE CONSTRAINTS
 # constraint 19
 #restrict the flow of the retailer to the collection centre with the collection rate
 model.collection_rate_constraints = pyo.ConstraintList()
 for k in model.retailers:
-        model.collection_rate_constraints.add(sum(model.w[k,m] for m in model.collection_centres) <= nu* sum(model.y[j,k] for j in model.plants))
-        # model.collection_rate_constraints.add(sum(model.w[k, m] for m in model.collection_centres) <= nu * retailer_demand[k])
+        model.collection_rate_constraints.add(sum(model.w[k,m] for m in model.collection_centres) <= nu * sum(model.y[j,k] for j in model.plants))
 
 
 # constraint 20
@@ -467,6 +484,15 @@ for k in model.retailers:
 model.reusing_rate_constraints = pyo.ConstraintList()
 for m in model.collection_centres:
         model.reusing_rate_constraints.add(sum(model.a[m,j] for j in model.plants) + sum(model.b[m,k] for k in model.retailers) <= sigma * sum(model.w[k,m] for k in model.retailers))
+
+# restrict the flow of collection centres with the rate of repairing (how many products received can be used after repairing)
+model.repairing_rate_constraints = pyo.ConstraintList()
+for m in model.collection_centres:
+    model.reusing_rate_constraints.add(
+        sum(model.a[m, j] for j in model.plants) + sum(model.b[m, k] for k in model.retailers)
+        + sum(model.g[m,r] for m in model.reprocessing_centres)
+        <= gamma * sum(model.w[k, m] for k in model.retailers))
+
 
 # constraint 21
 # the disposal of items must be at least of a certain rate that describes the items that don't meet the quality standard
@@ -476,28 +502,20 @@ for m in model.collection_centres:
 
 # reprocessing centres r-imperative rates
 
-#constraint 22
-model.refurbishing_rate_constraints = pyo.ConstraintList()
-for r in model.reprocessing_centres:
-    model.refurbishing_rate_constraints.add(
-        sum( model.c[r, k] for k in model.retailers) <= gamma * sum(model.f[m, r, c] for m in model.collection_centres for c in model.components))
-
-
+#constraint 22:
 model.repurposing_rate_constraints = pyo.ConstraintList()
 for r in model.reprocessing_centres:
-        model.repurposing_rate_constraints.add(sum(model.erp[r,j, c] for j in model.plants for c in model.components) + sum(model.c[r, k] for k in model.retailers) <= alpha * sum(model.f[m,r,c] for m in model.collection_centres for c in model.components))
+        model.repurposing_rate_constraints.add(sum(model.erp[r,j, c] for j in model.plants for c in model.components)  <= alpha * sum(model.f[m,r,c] for m in model.collection_centres for c in model.components))
 
 # constrain 23
 model.reprocessing_rate_constraints = pyo.ConstraintList()
 for r in model.reprocessing_centres:
         model.reprocessing_rate_constraints.add(sum(model.erp[r,j, c] for j in model.plants for c in model.components)
                                                 + sum(model.erm[r,j,c] for j in model.plants for c in model.components)
-                                                + sum(model.c[r, k] for k in model.retailers)
                                                 <= beta * sum(model.f[m,r,c] for m in model.collection_centres for c in model.components))
 
 
 # constraint 24: cannot send to the collection centre if the opening cost is not incurred
-
 model.opening_collection_constraints = pyo.ConstraintList()
 for m in model.collection_centres:
     for k in model.retailers:
