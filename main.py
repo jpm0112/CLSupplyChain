@@ -21,14 +21,15 @@ designs_number = 2 # for each part, two designs
 
 big_m = 100000 # todo find a good big m
 
-alpha = 0.2
-beta = 0.3
+
 nu = 0.2  # percentage collected from the retailers
 # rates for the outgoing flows of the collection centres
 sigma = 0.1  # percentage from the collected product that is good enough for reusing or repackaging
 lamda = 0.1  # percentage of the collected product that has to be disposed
-
-gamma = 0.1
+gamma = 0.1  # percentage from the collected product that is good enough for repairing
+# rates for the reprocessing centres
+alpha = 0.2  # % of components received in a reprocessing centre that are good enough to be repurposed
+beta = 0.3  # % of components received in a reprocessing centre that are good enough to be remaufactured
 
 
 supplier_list = list(range(supplier_number))
