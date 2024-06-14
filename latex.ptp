@@ -1,0 +1,12 @@
+# PCTeX Project File, Version 1.1
+	name: latex
+	texformat: latex
+	typesetmode: DVI
+	spellwordlist: american
+latex.tex
+	wndpos: 3 -1 -1 -8 -31 26 26 950 356
+	zorder: 0
+	edit: 0
+latex.log
+latex.aux
+latex.pdf
