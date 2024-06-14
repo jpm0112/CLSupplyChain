@@ -255,6 +255,7 @@ model.objective_relationship.add(
     + sum(model.a[m,j] * flow_cost_collection_centres_plants[m,j] for m in model.collection_centres for j in model.plants )
     + sum(model.b[m,k] * flow_cost_collection_retailer[m,k] for m in model.collection_centres for k in model.retailers )
     + sum(model.f[m,r,c] * flow_cost_collection_centres_reprocessing[m,r] for m in model.collection_centres for r in model.reprocessing_centres for c in model.components )
+    + sum(model.g[m, r] * flow_cost_collection_centres_reprocessing_products[m, r] for m in model.collection_centres for r in model.reprocessing_centres)
     + sum(model.dm[m, c] * flow_cost_collection_disposal[m, c] for m in model.collection_centres for c in model.components)
 
     # reprocessing centre costs
@@ -262,6 +263,7 @@ model.objective_relationship.add(
     + sum(model.er[r,j,c] * flow_cost_reprocessing_reclycling[r,j] for r in model.reprocessing_centres for j in model.plants for c in model.components )
     + sum(model.erm[r,j,c] * flow_cost_reprocessing_remanufacturing[r,j] for r in model.reprocessing_centres for j in model.plants for c in model.components )
     + sum(model.c[r,k] * flow_cost_reprocessing_repairing[r, k] for r in model.reprocessing_centres for k in model.retailers)
+
     # opening costs
     + sum(model.opm[m] * opening_cost_collection[m] for m in model.collection_centres)
     + sum(model.opr[r] * opening_cost_reprocessing[r] for r in model.reprocessing_centres)
