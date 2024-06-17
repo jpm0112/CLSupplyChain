@@ -8,16 +8,16 @@ import pandas as pd
 
 # watch out when defining a value to one. The saving fucntion of the csv file may save a list rather than matrix.
 # comment the loading section if you want to run a test instance defining one of the number values to one.
-supplier_number = 20
-plants_number = 20
+supplier_number = 12
+plants_number = 1
 retailers_number = 10
-collection_centres_number = 10
-reprocessing_centres_number = 2
-components_number = 3
+collection_centres_number = 3
+reprocessing_centres_number = 7
+components_number = 5
 architecture_number = 2
 r_imperatives_names = ['repurposing', 'remanufacturing', 'recycling', 'reusing', 'repairing'] # assuming A and B are reusing
 r_imperatives_number = len(r_imperatives_names)
-designs_number = 2 # for each part, two designs
+designs_number = 9 # for each part, two designs
 
 big_m = 100000 # todo find a good big m
 
@@ -41,27 +41,27 @@ designs_list = list(range(designs_number))
 # parameters
 np.random.seed(1048596)
 # Initialize capacities with random values within a sensible range
-suppliers_capacity = np.random.randint(400, 500, (supplier_number, designs_number))
-np.savetxt('suppliers_capacity.csv', suppliers_capacity, delimiter=delimiter)
-plants_capacity = np.random.randint(500, 800, (plants_number))
-np.savetxt('plants_capacity.csv', plants_capacity, delimiter=delimiter)
-retailer_demand = np.random.randint(200, 300, (retailers_number))
-np.savetxt('retailer_demand.csv', retailer_demand, delimiter=delimiter)
-collection_centres_capacity = np.random.randint(300, 500, (collection_centres_number, components_number))
-np.savetxt('collection_centres_capacity.csv', collection_centres_capacity, delimiter=delimiter)
+# suppliers_capacity = np.random.randint(400, 500, (supplier_number, designs_number))
+# np.savetxt('suppliers_capacity.csv', suppliers_capacity, delimiter=delimiter)
+# plants_capacity = np.random.randint(500, 800, (plants_number))
+# np.savetxt('plants_capacity.csv', plants_capacity, delimiter=delimiter)
+# retailer_demand = np.random.randint(200, 300, (retailers_number))
+# np.savetxt('retailer_demand.csv', retailer_demand, delimiter=delimiter)
+# collection_centres_capacity = np.random.randint(300, 500, (collection_centres_number, components_number))
+# np.savetxt('collection_centres_capacity.csv', collection_centres_capacity, delimiter=delimiter)
 
 
 # reprocessing_centres_capacity = np.random.randint(300, 400, (reprocessing_centres_number, components_number))
 # np.savetxt('reprocessing_centres_capacity.csv', reprocessing_centres_capacity, delimiter=delimiter)
 
-reprocessing_centres_capacity_repurposing = np.random.randint(300, 400, (reprocessing_centres_number, components_number))
-np.savetxt('reprocessing_centres_capacity_repurposing.csv', reprocessing_centres_capacity_repurposing, delimiter=delimiter)
-reprocessing_centres_capacity_remanufacturing = np.random.randint(300, 400,(reprocessing_centres_number, components_number))
-np.savetxt('reprocessing_centres_capacity_remanufacturing.csv', reprocessing_centres_capacity_remanufacturing, delimiter=delimiter)
-reprocessing_centres_capacity_recycling = np.random.randint(300, 400,(reprocessing_centres_number, components_number))
-np.savetxt('reprocessing_centres_capacity_recycling.csv', reprocessing_centres_capacity_recycling, delimiter=delimiter)
-reprocessing_centres_capacity_repairing = np.random.randint(300, 400, (reprocessing_centres_number))
-np.savetxt('reprocessing_centres_capacity_repairing.csv', reprocessing_centres_capacity_repairing, delimiter=delimiter)
+# reprocessing_centres_capacity_repurposing = np.random.randint(300, 400, (reprocessing_centres_number, components_number))
+# np.savetxt('reprocessing_centres_capacity_repurposing.csv', reprocessing_centres_capacity_repurposing, delimiter=delimiter)
+# reprocessing_centres_capacity_remanufacturing = np.random.randint(300, 400,(reprocessing_centres_number, components_number))
+# np.savetxt('reprocessing_centres_capacity_remanufacturing.csv', reprocessing_centres_capacity_remanufacturing, delimiter=delimiter)
+# reprocessing_centres_capacity_recycling = np.random.randint(300, 400,(reprocessing_centres_number, components_number))
+# np.savetxt('reprocessing_centres_capacity_recycling.csv', reprocessing_centres_capacity_recycling, delimiter=delimiter)
+# reprocessing_centres_capacity_repairing = np.random.randint(300, 400, (reprocessing_centres_number))
+# np.savetxt('reprocessing_centres_capacity_repairing.csv', reprocessing_centres_capacity_repairing, delimiter=delimiter)
 
 
 
@@ -80,8 +80,6 @@ np.savetxt('flow_cost_collection_disposal.csv', flow_cost_collection_disposal, d
 
 flow_cost_collection_centres_reprocessing = np.random.randint(1, 100, (collection_centres_number, reprocessing_centres_number))
 np.savetxt('flow_cost_collection_centres_reprocessing.csv', flow_cost_collection_centres_reprocessing, delimiter=delimiter)
-
-
 flow_cost_collection_centres_reprocessing_products = np.random.randint(1, 100,(collection_centres_number, reprocessing_centres_number))
 np.savetxt('flow_cost_collection_centres_reprocessing_products.csv', flow_cost_collection_centres_reprocessing_products, delimiter=delimiter)
 
@@ -103,24 +101,24 @@ np.savetxt('flow_cost_reprocessing_repairing.csv', flow_cost_reprocessing_repair
 
 
 
-opening_cost_collection = np.random.randint(1, 100, (collection_centres_number))
-np.savetxt('opening_cost_collection.csv', opening_cost_collection, delimiter=delimiter)
-opening_cost_reprocessing = np.random.randint(1, 100, (reprocessing_centres_number))
-np.savetxt('opening_cost_reprocessing.csv', opening_cost_reprocessing, delimiter=delimiter)
-opening_cost_supplier = np.random.randint(1, 100, (supplier_number))
-np.savetxt('opening_cost_supplier.csv', opening_cost_supplier, delimiter=delimiter)
+# opening_cost_collection = np.random.randint(1, 100, (collection_centres_number))
+# np.savetxt('opening_cost_collection.csv', opening_cost_collection, delimiter=delimiter)
+# opening_cost_reprocessing = np.random.randint(1, 100, (reprocessing_centres_number))
+# np.savetxt('opening_cost_reprocessing.csv', opening_cost_reprocessing, delimiter=delimiter)
+# opening_cost_supplier = np.random.randint(1, 100, (supplier_number))
+# np.savetxt('opening_cost_supplier.csv', opening_cost_supplier, delimiter=delimiter)
 
 # Initialize other parameters with random or specified values
-bill_of_materials = np.random.randint(1, 2, (architecture_number, components_number))  # rows are the architectures and columns are the part, replaces the r parameter in the model
-np.savetxt('bill_of_materials.csv', bill_of_materials, delimiter=delimiter)
-r_imperatives_of_architecture = np.random.randint(0, 2, (architecture_number,r_imperatives_number))  # rows are architectures and columns the part. It has a value of 1 if the r-imperative is possible with the architecutre
-np.savetxt('r_imperatives_of_architecture.csv', r_imperatives_of_architecture, delimiter=delimiter)
-r_imperatives_of_designs = np.random.randint(0, 2, (designs_number, r_imperatives_number))  # rows are designs and columns the part. It has a value of 1 if the r-imperative is possible with the design
-np.savetxt('r_imperatives_of_designs.csv', r_imperatives_of_designs, delimiter=delimiter)
+# bill_of_materials = np.random.randint(1, 2, (architecture_number, components_number))  # rows are the architectures and columns are the part, replaces the r parameter in the model
+# np.savetxt('bill_of_materials.csv', bill_of_materials, delimiter=delimiter)
+# r_imperatives_of_architecture = np.random.randint(0, 2, (architecture_number,r_imperatives_number))  # rows are architectures and columns the part. It has a value of 1 if the r-imperative is possible with the architecutre
+# np.savetxt('r_imperatives_of_architecture.csv', r_imperatives_of_architecture, delimiter=delimiter)
+# r_imperatives_of_designs = np.random.randint(0, 2, (designs_number, r_imperatives_number))  # rows are designs and columns the part. It has a value of 1 if the r-imperative is possible with the design
+# np.savetxt('r_imperatives_of_designs.csv', r_imperatives_of_designs, delimiter=delimiter)
 # designs_of_architecture = np.random.randint(0, 2, (architecture_number,designs_number))  # rows are architecture and columns the design. It has a value of 1 if the design is possible with the architecture
 # np.savetxt('designs_of_architecture.csv', designs_of_architecture, delimiter=delimiter)
-designs_of_components = np.random.randint(1, 2, (components_number, designs_number))  # rows are components and columns the design. It has a value of 1 if the design is possible with the part
-np.savetxt('designs_of_components.csv', designs_of_components, delimiter=delimiter)
+# designs_of_components = np.random.randint(1, 2, (components_number, designs_number))  # rows are components and columns the design. It has a value of 1 if the design is possible with the part
+# np.savetxt('designs_of_components.csv', designs_of_components, delimiter=delimiter)
 
 
 nu = 0.2  # percentage collected from the retailers
@@ -139,51 +137,61 @@ np.savetxt('beta.csv', beta, delimiter=delimiter)
 
 
 # TO LOAD CSVs
-suppliers_capacity = np.loadtxt('suppliers_capacity.csv', delimiter=delimiter)
-plants_capacity = np.loadtxt('plants_capacity.csv', delimiter=delimiter)
-retailer_demand = np.loadtxt('retailer_demand.csv', delimiter=delimiter)
-collection_centres_capacity = np.loadtxt('collection_centres_capacity.csv', delimiter=delimiter)
+suppliers_capacity = np.loadtxt('suppliers_capacity.csv', delimiter=delimiter, ndmin=1)
+plants_capacity = np.loadtxt('plants_capacity.csv', delimiter=delimiter, ndmin=1)
+retailer_demand = np.loadtxt('retailer_demand.csv', delimiter=delimiter, ndmin=1)
+collection_centres_capacity = np.loadtxt('collection_centres_capacity.csv', delimiter=delimiter, ndmin=1)
+reprocessing_centres_capacity_repurposing = np.loadtxt('reprocessing_centres_capacity_repurposing.csv', delimiter=delimiter, ndmin=2)
+reprocessing_centres_capacity_remanufacturing = np.loadtxt('reprocessing_centres_capacity_remanufacturing.csv',delimiter=delimiter, ndmin=2)
+reprocessing_centres_capacity_recycling = np.loadtxt('reprocessing_centres_capacity_recycling.csv',delimiter=delimiter, ndmin=2)
+reprocessing_centres_capacity_repairing = np.loadtxt('reprocessing_centres_capacity_repairing.csv', delimiter=delimiter,ndmin=2)
 
 
 # reprocessing_centres_capacity = np.loadtxt('reprocessing_centres_capacity.csv', delimiter=delimiter)
 
-flow_cost_reprocessing_repurposing = np.loadtxt('flow_cost_reprocessing_repurposing.csv', delimiter=delimiter)
-flow_cost_reprocessing_reclycling = np.loadtxt('flow_cost_reprocessing_reclycling.csv', delimiter=delimiter)
-flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_remanufacturing.csv', delimiter=delimiter)
-flow_cost_reprocessing_repairing = np.loadtxt('flow_cost_reprocessing_repairing.csv', delimiter=delimiter)
+flow_cost_reprocessing_repurposing = np.loadtxt('flow_cost_reprocessing_repurposing.csv', delimiter=delimiter, ndmin=2)
+flow_cost_reprocessing_reclycling = np.loadtxt('flow_cost_reprocessing_reclycling.csv', delimiter=delimiter, ndmin=2)
+flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_remanufacturing.csv', delimiter=delimiter,ndmin=2)
+flow_cost_reprocessing_repairing = np.loadtxt('flow_cost_reprocessing_repairing.csv', delimiter=delimiter, ndmin=2)
 
-flow_cost_suppliers_plants = np.loadtxt('flow_cost_suppliers_plants.csv', delimiter=delimiter)
-purchase_cost_suppliers = np.loadtxt('purchase_cost_suppliers.csv', delimiter=delimiter)
-flow_cost_plants_retailers = np.loadtxt('flow_cost_plants_retailers.csv', delimiter=delimiter)
-flow_cost_retailers_collection_centres = np.loadtxt('flow_cost_retailers_collection_centres.csv', delimiter=delimiter)
-flow_cost_collection_retailer = np.loadtxt('flow_cost_collection_retailer.csv', delimiter=delimiter)
-flow_cost_collection_disposal = np.loadtxt('flow_cost_collection_disposal.csv', delimiter=delimiter)
+flow_cost_suppliers_plants = np.loadtxt('flow_cost_suppliers_plants.csv', delimiter=delimiter, ndmin=2)
+purchase_cost_suppliers = np.loadtxt('purchase_cost_suppliers.csv', delimiter=delimiter, ndmin=2)
+flow_cost_plants_retailers = np.loadtxt('flow_cost_plants_retailers.csv', delimiter=delimiter, ndmin=2)
+flow_cost_retailers_collection_centres = np.loadtxt('flow_cost_retailers_collection_centres.csv', delimiter=delimiter,ndmin=2)
+flow_cost_collection_retailer = np.loadtxt('flow_cost_collection_retailer.csv', delimiter=delimiter, ndmin=2)
+flow_cost_collection_disposal = np.loadtxt('flow_cost_collection_disposal.csv', delimiter=delimiter, ndmin=2)
 
-flow_cost_collection_centres_reprocessing = np.loadtxt('flow_cost_collection_centres_remanufacturing.csv', delimiter=delimiter)
-flow_cost_collection_centres_reprocessing_products = np.loadtxt('flow_cost_collection_centres_reprocessing_products.csv',delimiter=delimiter)
-flow_cost_collection_centres_plants = np.loadtxt('flow_cost_collection_centres_plants.csv', delimiter=delimiter)
-flow_cost_disassembly_disposal = np.loadtxt('flow_cost_disassembly_disposal.csv', delimiter=delimiter)
-flow_cost_reprocessing_repurposing = np.loadtxt('flow_cost_reprocessing_repurposing.csv', delimiter=delimiter)
-flow_cost_reprocessing_reclycling = np.loadtxt('flow_cost_reprocessing_reclycling.csv', delimiter=delimiter)
-flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_remanufacturing.csv', delimiter=delimiter)
+flow_cost_collection_centres_reprocessing = np.loadtxt('flow_cost_collection_centres_reprocessing.csv', delimiter=delimiter,ndmin=2)
+flow_cost_collection_centres_reprocessing_products = np.loadtxt('flow_cost_collection_centres_reprocessing_products.csv',delimiter=delimiter,ndmin=2)
+flow_cost_collection_centres_plants = np.loadtxt('flow_cost_collection_centres_plants.csv', delimiter=delimiter, ndmin=2)
+flow_cost_disassembly_disposal = np.loadtxt('flow_cost_disassembly_disposal.csv', delimiter=delimiter, ndmin=1)
+flow_cost_reprocessing_repurposing = np.loadtxt('flow_cost_reprocessing_repurposing.csv', delimiter=delimiter, ndmin=2)
+flow_cost_reprocessing_reclycling = np.loadtxt('flow_cost_reprocessing_reclycling.csv', delimiter=delimiter, ndmin=2)
+flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_remanufacturing.csv', delimiter=delimiter,
+                                                    ndmin=2)
 
-opening_cost_collection = np.loadtxt('opening_cost_collection.csv', delimiter=delimiter)
-opening_cost_reprocessing = np.loadtxt('opening_cost_reprocessing.csv', delimiter=delimiter)
-opening_cost_supplier = np.loadtxt('opening_cost_supplier.csv', delimiter=delimiter)
 
-bill_of_materials = np.loadtxt('bill_of_materials.csv', delimiter=delimiter)
 
-r_imperatives_of_architecture = np.loadtxt('r_imperatives_of_architecture.csv', delimiter=delimiter)
-r_imperatives_of_designs = np.loadtxt('r_imperatives_of_designs.csv', delimiter=delimiter)
 
-designs_of_architecture = np.loadtxt('designs_of_architecture.csv', delimiter=delimiter)
-designs_of_components = np.loadtxt('designs_of_components.csv', delimiter=delimiter)
 
-flow_cost_reprocessing_repairing = np.loadtxt('flow_cost_reprocessing_repairing.csv', delimiter=delimiter)
 
-lamda = np.loadtxt('lamda.csv', delimiter=delimiter)
-alpha = np.loadtxt('alpha.csv', delimiter=delimiter)
-beta = np.loadtxt('beta.csv', delimiter=delimiter)
+opening_cost_collection = np.loadtxt('opening_cost_collection.csv', delimiter=delimiter, ndmin=1)
+opening_cost_reprocessing = np.loadtxt('opening_cost_reprocessing.csv', delimiter=delimiter, ndmin=1)
+opening_cost_supplier = np.loadtxt('opening_cost_supplier.csv', delimiter=delimiter, ndmin=1)
+
+bill_of_materials = np.loadtxt('bill_of_materials.csv', delimiter=delimiter, ndmin=1)
+
+r_imperatives_of_architecture = np.loadtxt('r_imperatives_of_architecture.csv', delimiter=delimiter, ndmin=1)
+r_imperatives_of_designs = np.loadtxt('r_imperatives_of_designs.csv', delimiter=delimiter, ndmin=1)
+
+designs_of_architecture = np.loadtxt('designs_of_architecture.csv', delimiter=delimiter, ndmin=1)
+designs_of_components = np.loadtxt('designs_of_components.csv', delimiter=delimiter, ndmin=1)
+
+flow_cost_reprocessing_repairing = np.loadtxt('flow_cost_reprocessing_repairing.csv', delimiter=delimiter, ndmin=1)
+
+lamda = np.loadtxt('lamda.csv', delimiter=delimiter, ndmin=1)
+alpha = np.loadtxt('alpha.csv', delimiter=delimiter, ndmin=1)
+beta = np.loadtxt('beta.csv', delimiter=delimiter, ndmin=1)
 
 
 
@@ -255,6 +263,7 @@ model.objective_relationship.add(
     + sum(model.a[m,j] * flow_cost_collection_centres_plants[m,j] for m in model.collection_centres for j in model.plants )
     + sum(model.b[m,k] * flow_cost_collection_retailer[m,k] for m in model.collection_centres for k in model.retailers )
     + sum(model.f[m,r,c] * flow_cost_collection_centres_reprocessing[m,r] for m in model.collection_centres for r in model.reprocessing_centres for c in model.components )
+    + sum(model.g[m, r] * flow_cost_collection_centres_reprocessing_products[m, r] for m in model.collection_centres for r in model.reprocessing_centres)
     + sum(model.dm[m, c] * flow_cost_collection_disposal[m, c] for m in model.collection_centres for c in model.components)
 
     # reprocessing centre costs
@@ -262,6 +271,7 @@ model.objective_relationship.add(
     + sum(model.er[r,j,c] * flow_cost_reprocessing_reclycling[r,j] for r in model.reprocessing_centres for j in model.plants for c in model.components )
     + sum(model.erm[r,j,c] * flow_cost_reprocessing_remanufacturing[r,j] for r in model.reprocessing_centres for j in model.plants for c in model.components )
     + sum(model.c[r,k] * flow_cost_reprocessing_repairing[r, k] for r in model.reprocessing_centres for k in model.retailers)
+
     # opening costs
     + sum(model.opm[m] * opening_cost_collection[m] for m in model.collection_centres)
     + sum(model.opr[r] * opening_cost_reprocessing[r] for r in model.reprocessing_centres)
