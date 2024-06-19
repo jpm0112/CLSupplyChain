@@ -557,10 +557,8 @@ opt = pyo.SolverFactory(solver)
 solution = opt.solve(model)
 
 
-
-
-
 # form suppliers to plants
+print("Variable X")
 for i in model.suppliers:
     for j in model.plants:
         for c in model.components:
@@ -569,9 +567,157 @@ for i in model.suppliers:
                     print("supplier:",i,"plant:",j,"component:",c, "design: ", d)
                     print(model.x[i, j, c,d].value)
 
+print("\nVariable Y")
+for j in model.plants:
+    for k in model.retailers:
+        if model.y[j, k].value != 0:
+            print("plants:", j, "retailers:", k)
+            print(model.y[j, k].value)
+
+
+print("\nVariable W")
+for k in model.retailers:
+    for m in model.collection_centres:
+        if model.w[k, m].value != 0:
+            print("retailers:", k, "collection_centres:", m)
+            print(model.w[k, m].value)
+
+
+print("\nVariable A")
+for m in model.collection_centres:
+    for j in model.plants:
+        if model.a[m, j].value != 0:
+            print("collection_centres:", m, "plants:", j)
+            print(model.a[m, j].value)
+
+
+print("\nVariable B")
+for m in model.collection_centres:
+    for k in model.retailers:
+        if model.b[m, k].value != 0:
+            print("collection_centres:", m, "retailers:", k)
+            print(model.b[m, k].value)
+
+
+print("\nVariable DK")
+for k in model.retailers:
+        if model.dk[k].value != 0:
+            print("retailers:", k)
+            print(model.dk[k].value)
+
+
+print("\nVariable DM")
+for m in model.collection_centres:
+    for c in model.components:
+        if model.dm[m, c].value != 0:
+            print("collection_centres:", m, "components:", c)
+            print(model.dm[m, c].value)
+
+
+print("\nVariable F")
+for m in model.collection_centres:
+    for r in model.reprocessing_centres:
+        for c in model.components:
+            if model.f[m, r, c].value != 0:
+                print("collection_centres:", m, "reprocessing_centres:", r, "components:", c)
+                print(model.f[m, r, c].value)
+
+
+print("\nVariable G")
+for m in model.collection_centres:
+    for r in model.reprocessing_centres:
+        if model.g[m, r].value != 0:
+            print("collection_centres:", m, "reprocessing_centres:", r)
+            print(model.g[m, r].value)
+
+
+print("\nVariable DE")
+for s in model.design_alternatives:
+    for c in model.components:
+        if model.de[s,c].value != 0:
+            print("design:", s, "component:", c)
+            print(model.de[s,c].value)
 
 
 
+print("\nVariable ERP")
+for r in model.reprocessing_centres:
+    for j in model.plants:
+        for c in model.components:
+            if model.erp[r,j,c].value != 0:
+                print("reprocessing_centres:", r, "plants:", j, "components:", c)
+                print(model.erp[r,j,c].value)
 
 
+print("\nVariable ERM")
+for r in model.reprocessing_centres:
+    for j in model.plants:
+        for c in model.components:
+            if model.erm[r, j, c].value != 0:
+                print("reprocessing_centres:", r, "plants:", j, "components:", c)
+                print(model.erm[r, j, c].value)
+
+
+print("\nVariable ER")
+for r in model.reprocessing_centres:
+    for j in model.plants:
+        for c in model.components:
+            if model.er[r,j,c].value != 0:
+                print("reprocessing_centres:", r, "plants:", j, "components:", c)
+                print(model.er[r,j,c].value)
+
+
+print("\nVariable C")
+for r in model.reprocessing_centres:
+    for k in model.retailers:
+        if model.c[r, k].value != 0:
+            print("reprocessing_centres:", r, "retailers:", k)
+            print(model.c[r, k].value)
+
+
+print("\nVariable OPM")
+for m in model.collection_centres:
+    if model.opm[m].value != 0:
+        print("collection_centres:", m)
+        print(model.opm[m].value)
+
+
+
+print("\nVariable OPR")
+for r in model.reprocessing_centres:
+    if model.opr[r].value != 0:
+        print("reprocessing_centres:", r)
+        print(model.opr[r].value)
+
+
+
+print("\nVariable OPS")
+for i in model.suppliers:
+    if model.ops[i].value != 0:
+        print("suppliers:", i)
+        print(model.ops[i].value)
+
+
+
+print("\nVariable OPP")
+for j in model.plants:
+    if model.opp[j].value != 0:
+        print("plants:", j)
+        print(model.opp[j].value)
+
+
+
+print("\nVariable AR")
+for a in model.architectures:
+    if model.ar[a].value != 0:
+        print("architectures:", a)
+        print(model.ar[a].value)
+
+
+
+print("\nVariable RIMP")
+for r in model.r_imperatives:
+    if model.rimp[r].value != 0:
+        print("r_imperatives:", r)
+        print(model.rimp[r].value)
 

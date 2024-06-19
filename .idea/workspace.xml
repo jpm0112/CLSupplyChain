@@ -4,44 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb19bcf8-64ef-4ee7-9c7e-6dedd7458d72" name="Changes" comment="with g in the objective function">
+    <list default="true" id="bb19bcf8-64ef-4ee7-9c7e-6dedd7458d72" name="Changes" comment="with different capacities in the reprocessing centres">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_06_2024_08_59_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_06_2024_08_59__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alpha.csv" beforeDir="false" afterPath="$PROJECT_DIR$/alpha.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beta.csv" beforeDir="false" afterPath="$PROJECT_DIR$/beta.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bill_of_materials.csv" beforeDir="false" afterPath="$PROJECT_DIR$/bill_of_materials.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collection_centres_capacity.csv" beforeDir="false" afterPath="$PROJECT_DIR$/collection_centres_capacity.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/designs_of_architecture.csv" beforeDir="false" afterPath="$PROJECT_DIR$/designs_of_architecture.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/designs_of_components.csv" beforeDir="false" afterPath="$PROJECT_DIR$/designs_of_components.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_collection_centres_plants.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_collection_centres_plants.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_collection_centres_reprocessing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_collection_centres_reprocessing.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flow_cost_collection_centres_reprocessing_products.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_collection_centres_reprocessing_products.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_collection_disposal.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_collection_disposal.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_collection_retailer.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_collection_retailer.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_disassembly_disposal.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_disassembly_disposal.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_plants_retailers.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_plants_retailers.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_reprocessing_reclycling.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_reprocessing_reclycling.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_reprocessing_refurbishing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_reprocessing_refurbishing.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_reprocessing_remanufacturing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_reprocessing_remanufacturing.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_reprocessing_repairing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_reprocessing_repairing.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_reprocessing_repurposing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_reprocessing_repurposing.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_retailers_collection_centres.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_retailers_collection_centres.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flow_cost_suppliers_plants.csv" beforeDir="false" afterPath="$PROJECT_DIR$/flow_cost_suppliers_plants.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lamda.csv" beforeDir="false" afterPath="$PROJECT_DIR$/lamda.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/opening_cost_collection.csv" beforeDir="false" afterPath="$PROJECT_DIR$/opening_cost_collection.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/opening_cost_reprocessing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/opening_cost_reprocessing.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/opening_cost_supplier.csv" beforeDir="false" afterPath="$PROJECT_DIR$/opening_cost_supplier.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plants_capacity.csv" beforeDir="false" afterPath="$PROJECT_DIR$/plants_capacity.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/purchase_cost_suppliers.csv" beforeDir="false" afterPath="$PROJECT_DIR$/purchase_cost_suppliers.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/r_imperatives_of_architecture.csv" beforeDir="false" afterPath="$PROJECT_DIR$/r_imperatives_of_architecture.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/r_imperatives_of_designs.csv" beforeDir="false" afterPath="$PROJECT_DIR$/r_imperatives_of_designs.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reprocessing_centres_capacity_recycling.csv" beforeDir="false" afterPath="$PROJECT_DIR$/reprocessing_centres_capacity_recycling.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reprocessing_centres_capacity_refurbishing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/reprocessing_centres_capacity_refurbishing.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reprocessing_centres_capacity_remanufacturing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/reprocessing_centres_capacity_remanufacturing.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reprocessing_centres_capacity_repairing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/reprocessing_centres_capacity_repairing.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reprocessing_centres_capacity_repurposing.csv" beforeDir="false" afterPath="$PROJECT_DIR$/reprocessing_centres_capacity_repurposing.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/retailer_demand.csv" beforeDir="false" afterPath="$PROJECT_DIR$/retailer_demand.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/suppliers_capacity.csv" beforeDir="false" afterPath="$PROJECT_DIR$/suppliers_capacity.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,17 +22,6 @@
       <list>
         <option value="Python Script" />
       </list>
-    </option>
-  </component>
-  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
-    <envs>
-      <env key="FLASK_APP" value="app" />
-    </envs>
-    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
-    <option name="myEnvs">
-      <map>
-        <entry key="FLASK_APP" value="app" />
-      </map>
     </option>
   </component>
   <component name="Git.Settings">
@@ -85,18 +43,18 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.main.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/juanp/PycharmProjects/CLSupplyChain",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.sourceCode.Python",
+    "settings.editor.selected.configurable": "preferences.keymap",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -108,6 +66,7 @@
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="CLSupplyChain" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -189,20 +148,6 @@
       <workItem from="1716925378263" duration="8000" />
       <workItem from="1717425512311" duration="1882000" />
       <workItem from="1717565055780" duration="1930000" />
-      <workItem from="1717567422900" duration="216000" />
-      <workItem from="1717658604449" duration="6000" />
-      <workItem from="1717978067444" duration="4898000" />
-      <workItem from="1717984235376" duration="177000" />
-      <workItem from="1717998417701" duration="200000" />
-      <workItem from="1718129125659" duration="2198000" />
-      <workItem from="1718174582659" duration="4000" />
-      <workItem from="1718306692207" duration="3472000" />
-      <workItem from="1718313384837" duration="142000" />
-      <workItem from="1718338392599" duration="3476000" />
-      <workItem from="1718345189135" duration="172000" />
-      <workItem from="1718356172855" duration="134000" />
-      <workItem from="1718356316888" duration="8000" />
-      <workItem from="1718598003348" duration="2898000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -404,63 +349,7 @@
       <option name="project" value="LOCAL" />
       <updated>1717566996771</updated>
     </task>
-    <task id="LOCAL-00026" summary="with different capacities in the reprocessing centres">
-      <option name="closed" value="true" />
-      <created>1717567431788</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1717567431789</updated>
-    </task>
-    <task id="LOCAL-00027" summary="with different capacities in the reprocessing centres">
-      <option name="closed" value="true" />
-      <created>1717567437935</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1717567437935</updated>
-    </task>
-    <task id="LOCAL-00028" summary="added the product flow between collection centres and repro. centres">
-      <option name="closed" value="true" />
-      <created>1717984037297</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1717984037297</updated>
-    </task>
-    <task id="LOCAL-00029" summary="added the product flow between collection centres and repro. centres">
-      <option name="closed" value="true" />
-      <created>1717984385794</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1717984385794</updated>
-    </task>
-    <task id="LOCAL-00030" summary="with rates depending on the desing alternative and disposal costs">
-      <option name="closed" value="true" />
-      <created>1718345139851</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1718345139851</updated>
-    </task>
-    <task id="LOCAL-00031" summary="with rates depending on the desing alternative and disposal costs">
-      <option name="closed" value="true" />
-      <created>1718345313991</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1718345313991</updated>
-    </task>
-    <task id="LOCAL-00032" summary="with g in the objective function">
-      <option name="closed" value="true" />
-      <created>1718356303156</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1718356303156</updated>
-    </task>
-    <option name="localTasksCounter" value="33" />
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -481,9 +370,9 @@
     <MESSAGE value="with changes" />
     <MESSAGE value="with new flow" />
     <MESSAGE value="with different capacities in the reprocessing centres" />
-    <MESSAGE value="added the product flow between collection centres and repro. centres" />
-    <MESSAGE value="with rates depending on the desing alternative and disposal costs" />
-    <MESSAGE value="with g in the objective function" />
-    <option name="LAST_COMMIT_MESSAGE" value="with g in the objective function" />
+    <option name="LAST_COMMIT_MESSAGE" value="with different capacities in the reprocessing centres" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/CLSupplyChain$main.coverage" NAME="main Coverage Results" MODIFIED="1718787387937" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
