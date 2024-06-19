@@ -107,6 +107,8 @@ np.savetxt('flow_cost_reprocessing_repairing.csv', flow_cost_reprocessing_repair
 # np.savetxt('opening_cost_reprocessing.csv', opening_cost_reprocessing, delimiter=delimiter)
 # opening_cost_supplier = np.random.randint(1, 100, (supplier_number))
 # np.savetxt('opening_cost_supplier.csv', opening_cost_supplier, delimiter=delimiter)
+opening_cost_plants = np.random.randint(1, 100, (plants_number))
+np.savetxt('opening_cost_plants.csv', opening_cost_plants, delimiter=delimiter)
 
 # Initialize other parameters with random or specified values
 # bill_of_materials = np.random.randint(1, 2, (architecture_number, components_number))  # rows are the architectures and columns are the part, replaces the r parameter in the model
@@ -167,8 +169,7 @@ flow_cost_collection_centres_plants = np.loadtxt('flow_cost_collection_centres_p
 flow_cost_disassembly_disposal = np.loadtxt('flow_cost_disassembly_disposal.csv', delimiter=delimiter, ndmin=1)
 flow_cost_reprocessing_repurposing = np.loadtxt('flow_cost_reprocessing_repurposing.csv', delimiter=delimiter, ndmin=2)
 flow_cost_reprocessing_reclycling = np.loadtxt('flow_cost_reprocessing_reclycling.csv', delimiter=delimiter, ndmin=2)
-flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_remanufacturing.csv', delimiter=delimiter,
-                                                    ndmin=2)
+flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_remanufacturing.csv', delimiter=delimiter,ndmin=2)
 
 
 
@@ -178,6 +179,7 @@ flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_rema
 opening_cost_collection = np.loadtxt('opening_cost_collection.csv', delimiter=delimiter, ndmin=1)
 opening_cost_reprocessing = np.loadtxt('opening_cost_reprocessing.csv', delimiter=delimiter, ndmin=1)
 opening_cost_supplier = np.loadtxt('opening_cost_supplier.csv', delimiter=delimiter, ndmin=1)
+opening_cost_plants = np.loadtxt('opening_cost_plants.csv', delimiter=delimiter, ndmin=1)
 
 bill_of_materials = np.loadtxt('bill_of_materials.csv', delimiter=delimiter, ndmin=1)
 
@@ -234,7 +236,7 @@ model.c = pyo.Var(model.reprocessing_centres, model.retailers, domain=pyo.NonNeg
 model.opm = pyo.Var(model.collection_centres, domain=pyo.Binary) # if we open the collection center m
 model.opr = pyo.Var(model.reprocessing_centres, domain=pyo.Binary) # if we open the reprocessing centre r
 model.ops = pyo.Var(model.suppliers, domain=pyo.Binary)  # if we open supplier i
-
+model.opp = pyo.Var(model.plants, domain=pyo.Binary)  # if we open plant j
 
 
 model.ar = pyo.Var(model.architectures, domain= pyo.Binary) # binary, 1 if the product follows architecture a
@@ -276,6 +278,7 @@ model.objective_relationship.add(
     + sum(model.opm[m] * opening_cost_collection[m] for m in model.collection_centres)
     + sum(model.opr[r] * opening_cost_reprocessing[r] for r in model.reprocessing_centres)
     + sum(model.ops[i] * opening_cost_supplier[i] for i in model.suppliers)
+    + sum(model.opp[j] * opening_cost_plants[j] for j in model.plants)
 
     <= model.monetary_costs)
 
@@ -540,6 +543,12 @@ for i in model.suppliers:
         for c in model.components:
             for d in model.design_alternatives:
                 model.opening_supplier_constraints.add(model.x[i, j, c,d] <= model.ops[i] * big_m)
+
+# constraint 27: cannot use plant j if the fixed cost is not incurred
+model.opening_plants_constraints = pyo.ConstraintList()
+for j in model.plants:
+    for k in model.retailers:
+            model.opening_plants_constraints.add(model.y[j,k] <= model.opp[j] * big_m)
 
 
 max_time = 25
