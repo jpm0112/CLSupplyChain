@@ -661,14 +661,14 @@ for k in model.retailers:
 #             print(model.dm[m, c].value)
 #
 #
-# print("\nVariable F")
-# for m in model.collection_centres:
-#     for r in model.reprocessing_centres:
-#         for c in model.components:
-#             if model.f[m, r, c].value != 0:
-#                 print("collection_centres:", m, "reprocessing_centres:", r, "components:", c)
-#                 print(model.f[m, r, c].value)
-#
+print("\nVariable F")
+for m in model.collection_centres:
+    for r in model.reprocessing_centres:
+        for c in model.components:
+            if model.f[m, r, c].value != 0:
+                print("collection_centres:", m, "reprocessing_centres:", r, "components:", c)
+                print(model.f[m, r, c].value)
+
 #
 # print("\nVariable G")
 # for m in model.collection_centres:
