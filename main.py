@@ -65,36 +65,36 @@ np.random.seed(1048596)
 
 
 
-flow_cost_suppliers_plants = np.random.randint(1, 100,(supplier_number, plants_number))  # suppliers as rows, plants as columns
+flow_cost_suppliers_plants = np.random.randint(1, 5,(supplier_number, plants_number))  # suppliers as rows, plants as columns
 np.savetxt('flow_cost_suppliers_plants.csv', flow_cost_suppliers_plants, delimiter=delimiter)
-purchase_cost_suppliers = np.random.randint(1, 100, (components_number, designs_number))  # suppliers as rows, plants as columns
+purchase_cost_suppliers = np.random.randint(1, 5, (components_number, designs_number))  # suppliers as rows, plants as columns
 np.savetxt('purchase_cost_suppliers.csv', purchase_cost_suppliers, delimiter=delimiter)
-flow_cost_plants_retailers = np.random.randint(1, 100, (plants_number, retailers_number))
+flow_cost_plants_retailers = np.random.randint(1, 5, (plants_number, retailers_number))
 np.savetxt('flow_cost_plants_retailers.csv', flow_cost_plants_retailers, delimiter=delimiter)
-flow_cost_retailers_collection_centres = np.random.randint(1, 50, (retailers_number, collection_centres_number))
+flow_cost_retailers_collection_centres = np.random.randint(1, 5, (retailers_number, collection_centres_number))
 np.savetxt('flow_cost_retailers_collection_centres.csv', flow_cost_retailers_collection_centres, delimiter=delimiter)
-flow_cost_collection_retailer = np.random.randint(1, 50, (collection_centres_number, retailers_number))
+flow_cost_collection_retailer = np.random.randint(1, 5, (collection_centres_number, retailers_number))
 np.savetxt('flow_cost_collection_retailer.csv', flow_cost_collection_retailer, delimiter=delimiter)
-flow_cost_collection_disposal = np.random.randint(1, 50, (collection_centres_number, components_number))
+flow_cost_collection_disposal = np.random.randint(1, 5, (collection_centres_number, components_number))
 np.savetxt('flow_cost_collection_disposal.csv', flow_cost_collection_disposal, delimiter=delimiter)
 
-flow_cost_collection_centres_reprocessing = np.random.randint(1, 100, (collection_centres_number, reprocessing_centres_number))
+flow_cost_collection_centres_reprocessing = np.random.randint(1, 5, (collection_centres_number, reprocessing_centres_number))
 np.savetxt('flow_cost_collection_centres_reprocessing.csv', flow_cost_collection_centres_reprocessing, delimiter=delimiter)
-flow_cost_collection_centres_reprocessing_products = np.random.randint(1, 100,(collection_centres_number, reprocessing_centres_number))
+flow_cost_collection_centres_reprocessing_products = np.random.randint(1, 5,(collection_centres_number, reprocessing_centres_number))
 np.savetxt('flow_cost_collection_centres_reprocessing_products.csv', flow_cost_collection_centres_reprocessing_products, delimiter=delimiter)
 
-flow_cost_collection_centres_plants = np.random.randint(1, 100, (collection_centres_number, plants_number))
+flow_cost_collection_centres_plants = np.random.randint(1, 5, (collection_centres_number, plants_number))
 np.savetxt('flow_cost_collection_centres_plants.csv', flow_cost_collection_centres_plants, delimiter=delimiter)
-flow_cost_disassembly_disposal = np.random.randint(1, 100, (collection_centres_number))
+flow_cost_disassembly_disposal = np.random.randint(1, 5, (collection_centres_number))
 np.savetxt('flow_cost_disassembly_disposal.csv', flow_cost_disassembly_disposal, delimiter=delimiter)
 
-flow_cost_reprocessing_repurposing = np.random.randint(1, 100, (reprocessing_centres_number, plants_number))
+flow_cost_reprocessing_repurposing = np.random.randint(1, 5, (reprocessing_centres_number, plants_number))
 np.savetxt('flow_cost_reprocessing_repurposing.csv', flow_cost_reprocessing_repurposing, delimiter=delimiter)
-flow_cost_reprocessing_reclycling = np.random.randint(1, 100, (reprocessing_centres_number, plants_number))
+flow_cost_reprocessing_reclycling = np.random.randint(1, 5, (reprocessing_centres_number, plants_number))
 np.savetxt('flow_cost_reprocessing_reclycling.csv', flow_cost_reprocessing_reclycling, delimiter=delimiter)
-flow_cost_reprocessing_remanufacturing = np.random.randint(1, 100, (reprocessing_centres_number, plants_number))
+flow_cost_reprocessing_remanufacturing = np.random.randint(1, 5, (reprocessing_centres_number, plants_number))
 np.savetxt('flow_cost_reprocessing_remanufacturing.csv', flow_cost_reprocessing_remanufacturing, delimiter=delimiter)
-flow_cost_reprocessing_repairing = np.random.randint(1, 100, (reprocessing_centres_number, retailers_number))
+flow_cost_reprocessing_repairing = np.random.randint(1, 5, (reprocessing_centres_number, retailers_number))
 np.savetxt('flow_cost_reprocessing_repairing.csv', flow_cost_reprocessing_repairing, delimiter=delimiter)
 
 
@@ -123,12 +123,12 @@ np.savetxt('opening_cost_plants.csv', opening_cost_plants, delimiter=delimiter)
 # np.savetxt('designs_of_components.csv', designs_of_components, delimiter=delimiter)
 
 
-nu = 0.2  # percentage collected from the retailers
+nu = 0.5  # percentage collected from the retailers
 # rates for the outgoing flows of the collection centres
 sigma = 0.1  # percentage from the collected product that is good enough for reusing or repackaging
-lamda = np.random.rand(designs_number) # percentage of the collected components that has to be disposed (depending on the design alternative)
+lamda = np.random.rand(designs_number)/4 # percentage of the collected components that has to be disposed (depending on the design alternative)
 np.savetxt('lamda.csv', lamda, delimiter=delimiter)
-gamma = 0.1  # percentage from the collected product that is good enough for repairing
+gamma = 0.3  # percentage from the collected product that is good enough for repairing
 # rates for the reprocessing centres
 alpha = np.random.rand(designs_number) # % of components received in a reprocessing centre that are good enough to be repurposed (depending on the design alternative)
 np.savetxt('alpha.csv', alpha, delimiter=delimiter)
@@ -157,7 +157,7 @@ flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_rema
 flow_cost_reprocessing_repairing = np.loadtxt('flow_cost_reprocessing_repairing.csv', delimiter=delimiter, ndmin=2)
 
 flow_cost_suppliers_plants = np.loadtxt('flow_cost_suppliers_plants.csv', delimiter=delimiter, ndmin=2)
-purchase_cost_suppliers = np.loadtxt('purchase_cost_suppliers.csv', delimiter=delimiter, ndmin=2)
+purchase_cost_suppliers = np.loadtxt('purchase_cost_suppliers.csv', delimiter=delimiter, ndmin=2)           *100000
 flow_cost_plants_retailers = np.loadtxt('flow_cost_plants_retailers.csv', delimiter=delimiter, ndmin=2)
 flow_cost_retailers_collection_centres = np.loadtxt('flow_cost_retailers_collection_centres.csv', delimiter=delimiter,ndmin=2)
 flow_cost_collection_retailer = np.loadtxt('flow_cost_collection_retailer.csv', delimiter=delimiter, ndmin=2)
@@ -174,10 +174,8 @@ flow_cost_reprocessing_remanufacturing = np.loadtxt('flow_cost_reprocessing_rema
 
 
 
-
-
-opening_cost_collection = np.loadtxt('opening_cost_collection.csv', delimiter=delimiter, ndmin=1)
-opening_cost_reprocessing = np.loadtxt('opening_cost_reprocessing.csv', delimiter=delimiter, ndmin=1)
+opening_cost_collection = np.loadtxt('opening_cost_collection.csv', delimiter=delimiter, ndmin=1) /1000000
+opening_cost_reprocessing = np.loadtxt('opening_cost_reprocessing.csv', delimiter=delimiter, ndmin=1) /100000
 opening_cost_supplier = np.loadtxt('opening_cost_supplier.csv', delimiter=delimiter, ndmin=1)
 opening_cost_plants = np.loadtxt('opening_cost_plants.csv', delimiter=delimiter, ndmin=1)
 
@@ -247,13 +245,17 @@ model.rimp = pyo.Var(model.r_imperatives, domain=pyo.Binary) # if r imperative e
 # variable to define the save the objective function value (just to have a nice code)
 model.monetary_costs = pyo.Var(domain=pyo.NonNegativeReals)
 
+# number of the components that come from the reverse flow (either to the plants or directly to the retailers)
+model.number_reutilized_components = pyo.Var( domain=pyo.NonNegativeReals)
+
 # objective function
-model.objective = pyo.Objective(expr=model.monetary_costs, sense=pyo.minimize)
+# model.objective = pyo.Objective(expr=model.monetary_costs, sense=pyo.minimize)
+model.objective = pyo.Objective(expr=model.number_reutilized_components, sense=pyo.maximize)
 
 # Constraints
 
-model.objective_relationship = pyo.ConstraintList()
-model.objective_relationship.add(
+model.objective_relationship_costs = pyo.ConstraintList()
+model.objective_relationship_costs.add(
     # supplier costs # transporation cost dependant on component and design alternative
     sum(model.x[i,j,c,d] * flow_cost_suppliers_plants[i,j] for i in model.suppliers for j in model.plants for c in model.components for d in model.design_alternatives)
     + sum(model.x[i,j,c,d] * purchase_cost_suppliers[c,d] for i in model.suppliers for j in model.plants for c in model.components for d in model.design_alternatives)
@@ -281,6 +283,14 @@ model.objective_relationship.add(
     + sum(model.opp[j] * opening_cost_plants[j] for j in model.plants)
 
     <= model.monetary_costs)
+
+model.objective_relationship_reutilization = pyo.ConstraintList()
+model.objective_relationship_reutilization.add(
+    sum(model.erp[r,j,c]+model.erm[r,j,c]+model.er[r,j,c] for r in model.reprocessing_centres for j in model.plants for c in model.components)
+    + sum(model.c[r,k]*bill_of_materials[a,c]*model.ar[a] for r in model.reprocessing_centres for k in model.retailers for c in model.components for a in model.architectures)
+    + sum(model.a[m,j]*bill_of_materials[a,c]*model.ar[a] for m in model.collection_centres for j in model.plants for c in model.components for a in model.architectures)
+    + sum(model.b[m, k] * bill_of_materials[a, c] * model.ar[a] for m in model.collection_centres for k in model.retailers for c in model.components for a in model.architectures)
+    >= model.number_reutilized_components)
 
 
 #CAPACITY CONSTRAINTS
@@ -451,7 +461,6 @@ for r in model.reprocessing_centres:
 
 
 
-
 # constraints 10: we have to select one and only one architecture
 model.architecture_limits = pyo.ConstraintList()
 model.architecture_limits.add(sum(model.ar[a] for a in model.ar) == 1)
@@ -556,6 +565,16 @@ solver = 'gurobi'
 opt = pyo.SolverFactory(solver)
 solution = opt.solve(model)
 
+for a in model.architectures:
+    # if model.ar[a].value != 0:
+    print("arch:", a)
+    print(model.ar[a].value)
+
+for s in model.design_alternatives:
+    for c in model.components:
+        if model.de[s, c].value != 0:
+            print("design alternative:", s, "component:", c)
+            print(model.de[s, c].value)
 
 # form suppliers to plants
 print("Variable X")
@@ -581,143 +600,143 @@ for k in model.retailers:
         if model.w[k, m].value != 0:
             print("retailers:", k, "collection_centres:", m)
             print(model.w[k, m].value)
+#
+#
+# print("\nVariable A")
+# for m in model.collection_centres:
+#     for j in model.plants:
+#         if model.a[m, j].value != 0:
+#             print("collection_centres:", m, "plants:", j)
+#             print(model.a[m, j].value)
+#
+#
+# print("\nVariable B")
+# for m in model.collection_centres:
+#     for k in model.retailers:
+#         if model.b[m, k].value != 0:
+#             print("collection_centres:", m, "retailers:", k)
+#             print(model.b[m, k].value)
+#
+#
+# print("\nVariable DK")
+# for k in model.retailers:
+#         if model.dk[k].value != 0:
+#             print("retailers:", k)
+#             print(model.dk[k].value)
+#
+#
+# print("\nVariable DM")
+# for m in model.collection_centres:
+#     for c in model.components:
+#         if model.dm[m, c].value != 0:
+#             print("collection_centres:", m, "components:", c)
+#             print(model.dm[m, c].value)
+#
+#
+# print("\nVariable F")
+# for m in model.collection_centres:
+#     for r in model.reprocessing_centres:
+#         for c in model.components:
+#             if model.f[m, r, c].value != 0:
+#                 print("collection_centres:", m, "reprocessing_centres:", r, "components:", c)
+#                 print(model.f[m, r, c].value)
+#
+#
+# print("\nVariable G")
+# for m in model.collection_centres:
+#     for r in model.reprocessing_centres:
+#         if model.g[m, r].value != 0:
+#             print("collection_centres:", m, "reprocessing_centres:", r)
+#             print(model.g[m, r].value)
+#
+#
+# print("\nVariable DE")
+# for s in model.design_alternatives:
+#     for c in model.components:
+#         if model.de[s,c].value != 0:
+#             print("design:", s, "component:", c)
+#             print(model.de[s,c].value)
+#
+#
+#
+# print("\nVariable ERP")
+# for r in model.reprocessing_centres:
+#     for j in model.plants:
+#         for c in model.components:
+#             if model.erp[r,j,c].value != 0:
+#                 print("reprocessing_centres:", r, "plants:", j, "components:", c)
+#                 print(model.erp[r,j,c].value)
+#
+#
+# print("\nVariable ERM")
+# for r in model.reprocessing_centres:
+#     for j in model.plants:
+#         for c in model.components:
+#             if model.erm[r, j, c].value != 0:
+#                 print("reprocessing_centres:", r, "plants:", j, "components:", c)
+#                 print(model.erm[r, j, c].value)
+#
+#
+# print("\nVariable ER")
+# for r in model.reprocessing_centres:
+#     for j in model.plants:
+#         for c in model.components:
+#             if model.er[r,j,c].value != 0:
+#                 print("reprocessing_centres:", r, "plants:", j, "components:", c)
+#                 print(model.er[r,j,c].value)
+#
+#
+# print("\nVariable C")
+# for r in model.reprocessing_centres:
+#     for k in model.retailers:
+#         if model.c[r, k].value != 0:
+#             print("reprocessing_centres:", r, "retailers:", k)
+#             print(model.c[r, k].value)
+#
+#
+# print("\nVariable OPM")
+# for m in model.collection_centres:
+#     if model.opm[m].value != 0:
+#         print("collection_centres:", m)
+#         print(model.opm[m].value)
+
+#
+#
+# print("\nVariable OPR")
+# for r in model.reprocessing_centres:
+#     if model.opr[r].value != 0:
+#         print("reprocessing_centres:", r)
+#         print(model.opr[r].value)
+#
+#
+#
+# print("\nVariable OPS")
+# for i in model.suppliers:
+#     if model.ops[i].value != 0:
+#         print("suppliers:", i)
+#         print(model.ops[i].value)
+#
+#
+#
+# print("\nVariable OPP")
+# for j in model.plants:
+#     if model.opp[j].value != 0:
+#         print("plants:", j)
+#         print(model.opp[j].value)
 
 
-print("\nVariable A")
-for m in model.collection_centres:
-    for j in model.plants:
-        if model.a[m, j].value != 0:
-            print("collection_centres:", m, "plants:", j)
-            print(model.a[m, j].value)
-
-
-print("\nVariable B")
-for m in model.collection_centres:
-    for k in model.retailers:
-        if model.b[m, k].value != 0:
-            print("collection_centres:", m, "retailers:", k)
-            print(model.b[m, k].value)
-
-
-print("\nVariable DK")
-for k in model.retailers:
-        if model.dk[k].value != 0:
-            print("retailers:", k)
-            print(model.dk[k].value)
-
-
-print("\nVariable DM")
-for m in model.collection_centres:
-    for c in model.components:
-        if model.dm[m, c].value != 0:
-            print("collection_centres:", m, "components:", c)
-            print(model.dm[m, c].value)
-
-
-print("\nVariable F")
-for m in model.collection_centres:
-    for r in model.reprocessing_centres:
-        for c in model.components:
-            if model.f[m, r, c].value != 0:
-                print("collection_centres:", m, "reprocessing_centres:", r, "components:", c)
-                print(model.f[m, r, c].value)
-
-
-print("\nVariable G")
-for m in model.collection_centres:
-    for r in model.reprocessing_centres:
-        if model.g[m, r].value != 0:
-            print("collection_centres:", m, "reprocessing_centres:", r)
-            print(model.g[m, r].value)
-
-
-print("\nVariable DE")
-for s in model.design_alternatives:
-    for c in model.components:
-        if model.de[s,c].value != 0:
-            print("design:", s, "component:", c)
-            print(model.de[s,c].value)
-
-
-
-print("\nVariable ERP")
-for r in model.reprocessing_centres:
-    for j in model.plants:
-        for c in model.components:
-            if model.erp[r,j,c].value != 0:
-                print("reprocessing_centres:", r, "plants:", j, "components:", c)
-                print(model.erp[r,j,c].value)
-
-
-print("\nVariable ERM")
-for r in model.reprocessing_centres:
-    for j in model.plants:
-        for c in model.components:
-            if model.erm[r, j, c].value != 0:
-                print("reprocessing_centres:", r, "plants:", j, "components:", c)
-                print(model.erm[r, j, c].value)
-
-
-print("\nVariable ER")
-for r in model.reprocessing_centres:
-    for j in model.plants:
-        for c in model.components:
-            if model.er[r,j,c].value != 0:
-                print("reprocessing_centres:", r, "plants:", j, "components:", c)
-                print(model.er[r,j,c].value)
-
-
-print("\nVariable C")
-for r in model.reprocessing_centres:
-    for k in model.retailers:
-        if model.c[r, k].value != 0:
-            print("reprocessing_centres:", r, "retailers:", k)
-            print(model.c[r, k].value)
-
-
-print("\nVariable OPM")
-for m in model.collection_centres:
-    if model.opm[m].value != 0:
-        print("collection_centres:", m)
-        print(model.opm[m].value)
-
-
-
-print("\nVariable OPR")
-for r in model.reprocessing_centres:
-    if model.opr[r].value != 0:
-        print("reprocessing_centres:", r)
-        print(model.opr[r].value)
-
-
-
-print("\nVariable OPS")
-for i in model.suppliers:
-    if model.ops[i].value != 0:
-        print("suppliers:", i)
-        print(model.ops[i].value)
-
-
-
-print("\nVariable OPP")
-for j in model.plants:
-    if model.opp[j].value != 0:
-        print("plants:", j)
-        print(model.opp[j].value)
-
-
-
-print("\nVariable AR")
-for a in model.architectures:
-    if model.ar[a].value != 0:
-        print("architectures:", a)
-        print(model.ar[a].value)
-
-
-
-print("\nVariable RIMP")
-for r in model.r_imperatives:
-    if model.rimp[r].value != 0:
-        print("r_imperatives:", r)
-        print(model.rimp[r].value)
-
+#
+# print("\nVariable AR")
+# for a in model.architectures:
+#     if model.ar[a].value != 0:
+#         print("architectures:", a)
+#         print(model.ar[a].value)
+#
+#
+#
+# print("\nVariable RIMP")
+# for r in model.r_imperatives:
+#     if model.rimp[r].value != 0:
+#         print("r_imperatives:", r)
+#         print(model.rimp[r].value)
+#
