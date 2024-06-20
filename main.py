@@ -370,7 +370,6 @@ for j in model.plants:
 # constraint 7: flow of the retailers
 model.retailers_flow = pyo.ConstraintList()
 for k in model.retailers:
-
         model.retailers_flow.add(sum(model.y[j,k] for j in model.plants)
                                  + sum(model.b[m,k] for m in model.collection_centres)
                                  - sum(model.w[k,m] for m in model.collection_centres)
@@ -382,10 +381,10 @@ for k in model.retailers:
 model.collections_centres_flow = pyo.ConstraintList()
 for m in model.collection_centres:
     for c in model.components:
-
             model.collections_centres_flow.add(sum(bill_of_materials[a,c] * model.ar[a] * model.w[k,m] for k in model.retailers for a in model.architectures)
                                  - sum(bill_of_materials[a,c] * model.ar[a] * model.a[m,j] for j in model.plants for a in model.architectures)
                                  - sum(bill_of_materials[a, c] * model.ar[a] * model.b[m, k] for k in model.retailers for a in model.architectures)
+                                 - sum(bill_of_materials[a, c] * model.ar[a] * model.g[m, r] for r in model.reprocessing_centres for a in model.architectures)
                                  - model.dm[m,c]
                                  - sum(model.f[m,r,c] for r in model.reprocessing_centres)
                                  == 0)
@@ -622,28 +621,37 @@ for j in model.plants:
             print(model.y[j, k].value)
 
 
+
+sum=0
 print("\nVariable W")
 for k in model.retailers:
     for m in model.collection_centres:
         if model.w[k, m].value != 0:
             print("retailers:", k, "collection_centres:", m)
             print(model.w[k, m].value)
-#
-#
-# print("\nVariable A")
-# for m in model.collection_centres:
-#     for j in model.plants:
-#         if model.a[m, j].value != 0:
-#             print("collection_centres:", m, "plants:", j)
-#             print(model.a[m, j].value)
-#
-#
-# print("\nVariable B")
-# for m in model.collection_centres:
-#     for k in model.retailers:
-#         if model.b[m, k].value != 0:
-#             print("collection_centres:", m, "retailers:", k)
-#             print(model.b[m, k].value)
+            if m == 0:
+                sum = sum + model.w[k, m].value
+
+sum = 0
+print("\nVariable A")
+for m in model.collection_centres:
+    for j in model.plants:
+        if model.a[m, j].value != 0:
+            print("collection_centres:", m, "plants:", j)
+            print(model.a[m, j].value)
+            if m == 0:
+                sum = sum + model.a[m, j].value
+
+sum=0
+print("\nVariable B")
+for m in model.collection_centres:
+    for k in model.retailers:
+        if model.b[m, k].value != 0:
+            print("collection_centres:", m, "retailers:", k)
+            print(model.b[m, k].value)
+            if m == 0:
+                sum = sum + model.b[m, k].value
+
 #
 #
 # print("\nVariable DK")
@@ -653,14 +661,18 @@ for k in model.retailers:
 #             print(model.dk[k].value)
 #
 #
-# print("\nVariable DM")
-# for m in model.collection_centres:
-#     for c in model.components:
-#         if model.dm[m, c].value != 0:
-#             print("collection_centres:", m, "components:", c)
-#             print(model.dm[m, c].value)
+sum = 0
+print("\nVariable DM")
+for m in model.collection_centres:
+    for c in model.components:
+        if model.dm[m, c].value != 0:
+            print("collection_centres:", m, "components:", c)
+            print(model.dm[m, c].value)
+            if m == 0 and c == 0:
+                sum = sum + model.f[m, r, c].value
 #
 #
+sum = 0
 print("\nVariable F")
 for m in model.collection_centres:
     for r in model.reprocessing_centres:
@@ -668,14 +680,20 @@ for m in model.collection_centres:
             if model.f[m, r, c].value != 0:
                 print("collection_centres:", m, "reprocessing_centres:", r, "components:", c)
                 print(model.f[m, r, c].value)
+                if m == 0 and c == 0:
+                    sum = sum + model.f[m, r, c].value
 
-#
-# print("\nVariable G")
-# for m in model.collection_centres:
-#     for r in model.reprocessing_centres:
-#         if model.g[m, r].value != 0:
-#             print("collection_centres:", m, "reprocessing_centres:", r)
-#             print(model.g[m, r].value)
+
+
+sum = 0
+print("\nVariable G")
+for m in model.collection_centres:
+    for r in model.reprocessing_centres:
+        if model.g[m, r].value != 0:
+            print("collection_centres:", m, "reprocessing_centres:", r)
+            print(model.g[m, r].value)
+            if m == 0:
+                sum = sum + model.g[m, r].value
 #
 #
 # print("\nVariable DE")
@@ -687,22 +705,22 @@ for m in model.collection_centres:
 #
 #
 #
-# print("\nVariable ERP")
-# for r in model.reprocessing_centres:
-#     for j in model.plants:
-#         for c in model.components:
-#             if model.erp[r,j,c].value != 0:
-#                 print("reprocessing_centres:", r, "plants:", j, "components:", c)
-#                 print(model.erp[r,j,c].value)
+print("\nVariable ERP")
+for r in model.reprocessing_centres:
+    for j in model.plants:
+        for c in model.components:
+            if model.erp[r,j,c].value != 0:
+                print("reprocessing_centres:", r, "plants:", j, "components:", c)
+                print(model.erp[r,j,c].value)
+
 #
-#
-# print("\nVariable ERM")
-# for r in model.reprocessing_centres:
-#     for j in model.plants:
-#         for c in model.components:
-#             if model.erm[r, j, c].value != 0:
-#                 print("reprocessing_centres:", r, "plants:", j, "components:", c)
-#                 print(model.erm[r, j, c].value)
+print("\nVariable ERM")
+for r in model.reprocessing_centres:
+    for j in model.plants:
+        for c in model.components:
+            if model.erm[r, j, c].value != 0:
+                print("reprocessing_centres:", r, "plants:", j, "components:", c)
+                print(model.erm[r, j, c].value)
 #
 #
 # print("\nVariable ER")
@@ -714,12 +732,12 @@ for m in model.collection_centres:
 #                 print(model.er[r,j,c].value)
 #
 #
-# print("\nVariable C")
-# for r in model.reprocessing_centres:
-#     for k in model.retailers:
-#         if model.c[r, k].value != 0:
-#             print("reprocessing_centres:", r, "retailers:", k)
-#             print(model.c[r, k].value)
+print("\nVariable C")
+for r in model.reprocessing_centres:
+    for k in model.retailers:
+        if model.c[r, k].value != 0:
+            print("reprocessing_centres:", r, "retailers:", k)
+            print(model.c[r, k].value)
 #
 #
 # print("\nVariable OPM")
@@ -768,3 +786,20 @@ for m in model.collection_centres:
 #         print("r_imperatives:", r)
 #         print(model.rimp[r].value)
 #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
