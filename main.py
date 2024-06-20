@@ -126,13 +126,13 @@ np.savetxt('opening_cost_plants.csv', opening_cost_plants, delimiter=delimiter)
 nu = 0.5  # percentage collected from the retailers
 # rates for the outgoing flows of the collection centres
 sigma = 0.1  # percentage from the collected product that is good enough for reusing or repackaging
-lamda = np.random.rand(designs_number)/4 # percentage of the collected components that has to be disposed (depending on the design alternative)
+lamda = np.full(designs_number, 0.1)# percentage of the collected components that has to be disposed (depending on the design alternative)
 np.savetxt('lamda.csv', lamda, delimiter=delimiter)
 gamma = 0.3  # percentage from the collected product that is good enough for repairing
 # rates for the reprocessing centres
-alpha = np.random.rand(designs_number) # % of components received in a reprocessing centre that are good enough to be repurposed (depending on the design alternative)
+alpha = np.full(designs_number, 0.1) # % of components received in a reprocessing centre that are good enough to be repurposed (depending on the design alternative)
 np.savetxt('alpha.csv', alpha, delimiter=delimiter)
-beta = np.random.rand(designs_number)  # % of components received in a reprocessing centre that are good enough to be remaufactured (depending on the design alternative)
+beta = np.full(designs_number, 0.1)  # % of components received in a reprocessing centre that are good enough to be remaufactured (depending on the design alternative)
 np.savetxt('beta.csv', beta, delimiter=delimiter)
 
 
@@ -251,6 +251,13 @@ model.number_reutilized_components = pyo.Var( domain=pyo.NonNegativeReals)
 # objective function
 # model.objective = pyo.Objective(expr=model.monetary_costs, sense=pyo.minimize)
 model.objective = pyo.Objective(expr=model.number_reutilized_components, sense=pyo.maximize)
+
+
+# auxiliary variable to linearize the model
+model.aux_ar_de = pyo.Var(model.architectures,model.design_alternatives,model.components, domain=pyo.Binary)  # multiplication between ar and de varibales
+
+
+
 
 # Constraints
 
@@ -509,16 +516,16 @@ for m in model.collection_centres:
         + sum(model.g[m,r] for r in model.reprocessing_centres)
         <= gamma * sum(model.w[k, m] for k in model.retailers))
 
-
 # constraint 21
 # the disposal of items must be at least of a certain rate that describes the items that don't meet the quality standard
 model.disposal_rate_constraints = pyo.ConstraintList()
 for m in model.collection_centres:
     for c in model.components:
-        model.disposal_rate_constraints.add(model.dm[m,c] >= sum(model.w[k,m]*bill_of_materials[a,c]*lamda[s]*model.de[s,c] for k in model.retailers for a in model.architectures for s in model.design_alternatives))
+        model.disposal_rate_constraints.add(model.dm[m,c] >= sum( model.w[k,m] * bill_of_materials[a,c]  * lamda[s] * model.aux_ar_de[a,s,c] for k in model.retailers for a in model.architectures for s in model.design_alternatives))
+
+
 
 # reprocessing centres r-imperative rates
-
 #constraint 22:
 model.repurposing_rate_constraints = pyo.ConstraintList()
 for r in model.reprocessing_centres:
@@ -558,6 +565,27 @@ model.opening_plants_constraints = pyo.ConstraintList()
 for j in model.plants:
     for k in model.retailers:
             model.opening_plants_constraints.add(model.y[j,k] <= model.opp[j] * big_m)
+
+
+
+
+
+model.auxiliary_contraints_ar_de = pyo.ConstraintList()
+for a in model.architectures:
+    for s in model.design_alternatives:
+        for c in model.components:
+            model.auxiliary_contraints_ar_de.add(model.aux_ar_de[a, s,c] <= model.ar[a])
+            model.auxiliary_contraints_ar_de.add(model.aux_ar_de[a, s,c] <= model.de[s,c])
+            model.auxiliary_contraints_ar_de.add(model.aux_ar_de[a, s,c] >= model.ar[a] + model.de[s,c] - 1)
+
+
+
+
+
+
+
+
+
 
 
 max_time = 25
